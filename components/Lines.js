@@ -6,6 +6,7 @@ import {
     Image,
     ListView
 } from 'react-native'
+import config from '../config.json';
 
 export default class Lines extends React.Component {
     static navigationOptions = {
@@ -20,11 +21,10 @@ export default class Lines extends React.Component {
         this.state = {
             lines: [],
             dataSource: ds,
-
         };
     }
     componentDidMount() {
-        var url = 'http://10.193.235.154:3000/mobileAPI/retrieveList?type=lines';
+        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=lines';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 debugger;

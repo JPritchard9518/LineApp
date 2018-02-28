@@ -8,6 +8,7 @@ import {
   Keyboard
 } from 'react-native';
 import { StackNavigator } from 'react-navigation'; // 1.0.0-beta.27
+import config from '../config.json';
 // import Home from './components/Home.js';
 
 
@@ -33,7 +34,7 @@ export default class LoginScreen extends Component {
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
-    var url = 'http://10.193.235.154:3000/mobileAPI/validateLineManager?userName=' + userName + '&password=' + password;
+    var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/validateLineManager?userName=' + userName + '&password=' + password;
     return fetch(url).then((response) => response.json())
       .then((responseJson) => {
         debugger;

@@ -6,6 +6,7 @@ import {
     Image,
     ListView
 } from 'react-native'
+import config from '../config.json';
 
 export default class Users extends React.Component {
     static navigationOptions = {
@@ -24,7 +25,7 @@ export default class Users extends React.Component {
         };
     }
     componentDidMount() {
-        var url = 'http://10.0.0.6:3000/mobileAPI/retrieveList?type=users';
+        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=users';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 debugger;
