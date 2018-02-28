@@ -1,0 +1,105 @@
+import React, { Component } from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Button,
+  Keyboard
+} from 'react-native';
+import { StackNavigator } from 'react-navigation'; // 1.0.0-beta.27
+// import Home from './components/Home.js';
+
+
+
+export default class LoginScreen extends Component {
+  static navigationOptions = {
+    title: 'Login',
+    headerTitleStyle: {
+      color: '#FFF',
+    },
+  };
+  constructor(props) {
+    super(props)
+    this.state = {
+      userName: '',
+      password: '',
+      errorMessage: '',
+    }
+    this.login = this.login.bind(this);
+  }
+  login() {
+    debugger;
+    Keyboard.dismiss()
+    var userName = this.state.userName;
+    var password = this.state.password;
+    var url = 'http://10.193.235.154:3000/mobileAPI/validateLineManager?userName=' + userName + '&password=' + password;
+    return fetch(url).then((response) => response.json())
+      .then((responseJson) => {
+        debugger;
+        if (responseJson.success) {
+          this.props.navigation.navigate('DrawerStack')
+        } else {
+          this.setState({ errorMessage: responseJson.message })
+        }
+
+      })
+      .catch((error) => {
+        this.setState({ errorMessage: error })
+      });
+  }
+  render() {
+    const { navigate } = this.props.navigation;
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.header}>Line Manager Login</Text>
+        <TextInput
+          ref="userName"
+          style={styles.input}
+          onChangeText={(userName) => this.setState({ userName: userName })}
+          placeholder="Username" />
+        <TextInput
+          ref="password"
+          style={styles.input}
+          onChangeText={((password) => this.setState({ password: password }))}
+          secureTextEntry={true}
+          placeholder="Password" />
+        <View style={styles.buttonContainer}>
+          <Button
+            onPress={this.login}
+            title="Login" />
+        </View>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{this.state.errorMessage}</Text>
+        </View>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+    paddingTop: 30,
+  },
+  input: {
+    width: '75%'
+  },
+  header: {
+    fontSize: 30,
+    paddingBottom: 30
+  },
+  buttonContainer: {
+    marginTop: 30
+  },
+  errorContainer: {
+    paddingTop: 30,
+  },
+  errorText: {
+    color: 'red',
+  }
+});
