@@ -4,11 +4,12 @@ import {
     Text,
     View,
     Image,
-    ListView
+    ListView,
+    TouchableOpacity
 } from 'react-native'
 import config from '../config.json';
 
-export default class Lines extends React.Component {
+export default class LinesList extends React.Component {
     static navigationOptions = {
         title: 'Lines',
         headerTitleStyle: {
@@ -27,7 +28,6 @@ export default class Lines extends React.Component {
         var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=lines';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
-                debugger;
                 this.setState({
                     dataSource: this.state.dataSource.cloneWithRows(responseJson)
                 })
@@ -39,13 +39,13 @@ export default class Lines extends React.Component {
     }
     renderRow(line) {
         return (
-            <View style={Styles.lineContainer}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('Line',{line:line})} style={Styles.lineContainer}>
                 <Text>Line Name: {line.name}</Text>
                 <Text>Resource: {line.resource}</Text>
-                <Text>Capacity: {line.capacity}</Text>
+                <Text>Capacity: {line.currentCapacity}/{line.capacity}</Text>
                 <Text>Open - Close: {line.openCloseTime}</Text>
                 <Text>Date Created: {line.dateCreated}</Text>
-            </View>
+            </TouchableOpacity>
         )
     }
     render() {
@@ -62,7 +62,6 @@ const Styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        marginTop: 20
     },
     lineContainer: {
         padding: 30,

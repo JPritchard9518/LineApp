@@ -5,11 +5,20 @@ import LoginScreen from './components/Login.js'
 import Admins from './components/Admins.js'
 import Users from './components/Users.js'
 import LineManagers from './components/LineManagers.js'
-import Lines from './components/Lines.js'
+import LinesList from './components/LinesList.js'
+import Line from './components/Line.js'
 
-// drawer stack
+
+const LineStack = StackNavigator({
+  "Lines": {screen: LinesList},
+  "Line": {screen: Line}
+},{
+    headerMode: 'none',
+    initialRouteName: 'Lines'
+})
+// drawer stack (menu)
 const DrawerStack = DrawerNavigator({
-  "Lines": { screen: Lines },
+  "Lines": { screen: LineStack },
   "Admins": { screen: Admins },
   "Users": { screen: Users },
   "Line Mangers": { screen: LineManagers },

@@ -30,14 +30,12 @@ export default class LoginScreen extends Component {
     this.login = this.login.bind(this);
   }
   login() {
-    debugger;
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
     var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/validateLineManager?userName=' + userName + '&password=' + password;
     return fetch(url).then((response) => response.json())
       .then((responseJson) => {
-        debugger;
         if (responseJson.success) {
           this.props.navigation.navigate('DrawerStack')
         } else {
