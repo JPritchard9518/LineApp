@@ -37,7 +37,7 @@ export default class Line extends React.Component {
                         line: responseJson.line
                     })
                 }else{
-                    // Recipient was not granted access
+                    // Handle recipient denied access here
                 }
             })
             .catch((error) => {
@@ -54,7 +54,7 @@ export default class Line extends React.Component {
                     <Text style={Styles.lineAttribute}>Open - Close: {this.state.line.openCloseTime}</Text>
                 </View>
                 <Text>{this.state.errorMessage}</Text>
-                <Text>Recipient Currently Accessing: {this.state.currentRecipientID}</Text>
+                <Text style={{width: '75%', alignSelf: 'center', fontSize: 20}}>Recipient Currently Accessing: {this.state.currentRecipientID}</Text>
                 <TouchableOpacity style={Styles.accessButton} onPress={() => this.attemptLineAccess()}>
                     <Text style={Styles.accessButtonText}>Access Line</Text>
                 </TouchableOpacity>

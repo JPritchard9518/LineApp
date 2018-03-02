@@ -43,15 +43,15 @@ export default class RecipientsList extends React.Component {
     renderRow(recipient) {
         return (
             <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient',{recipient:recipient})} style={Styles.recipientContainer}>
-                <Text>First Name: {recipient.firstName}</Text>
-                <Text>Last Name: {recipient.lastName}</Text>
-                <Text>Country: {recipient.country}</Text>
-                <Text>Language(s): {recipient.languages}</Text>
-                <Text>Case Number: {recipient.caseNumber}</Text>
-                <Text>Housing Location: {recipient.housingLocation}</Text>
-                <Text>Special Needs: {recipient.specialNeeds}</Text>
-                <Text>Family Members: {recipient.familyMembers.length}</Text>
-                <Text>Date Created: {recipient.dateCreated}</Text>
+                <Text style={Styles.recipientContainerText}>First Name: {recipient.firstName}</Text>
+                <Text style={Styles.recipientContainerText}>Last Name: {recipient.lastName}</Text>
+                <Text style={Styles.recipientContainerText}>Country: {recipient.country}</Text>
+                <Text style={Styles.recipientContainerText}>Language(s): {recipient.languages}</Text>
+                <Text style={Styles.recipientContainerText}>Case Number: {recipient.caseNumber}</Text>
+                <Text style={Styles.recipientContainerText}>Housing Location: {recipient.housingLocation}</Text>
+                <Text style={Styles.recipientContainerText}>Special Needs: {recipient.specialNeeds}</Text>
+                <Text style={Styles.recipientContainerText}>Family Members: {recipient.familyMembers.length}</Text>
+                <Text style={Styles.recipientContainerText}>Date Created: {recipient.dateCreated}</Text>
             </TouchableOpacity>
         )
     }
@@ -85,7 +85,14 @@ const Styles = StyleSheet.create({
     },
     recipientContainer: {
         padding: 30,
-        backgroundColor: '#DCDCDC',
-        marginBottom: 10
+        backgroundColor: '#FFF',
+        borderColor: '#000',
+        marginBottom: 10,
+        margin: 10,
+        borderRadius: 3,
+        elevation: 3
+    },
+    recipientContainerText: {
+        fontSize: 18
     }
 })

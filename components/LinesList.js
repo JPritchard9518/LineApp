@@ -40,13 +40,14 @@ export default class LinesList extends React.Component {
             });
     }
     renderRow(line) {
+        debugger;
         return (
             <TouchableOpacity onPress={() => this.props.navigation.navigate('Line',{line:line})} style={Styles.lineContainer}>
-                <Text>Line Name: {line.name}</Text>
-                <Text>Resource: {line.resource}</Text>
-                <Text>Capacity: {line.currentCapacity}/{line.capacity}</Text>
-                <Text>Open - Close: {line.openCloseTime}</Text>
-                <Text>Date Created: {line.dateCreated}</Text>
+                <Text style={Styles.lineContainerText}>Line Name: {line.name}</Text>
+                <Text style={Styles.lineContainerText}>Resource: {line.resource}</Text>
+                <Text style={Styles.lineContainerText}>Capacity: {line.currentCapacity}/{line.capacity}</Text>
+                <Text style={Styles.lineContainerText}>Open - Close: {line.openCloseTime}</Text>
+                <Text style={Styles.lineContainerText}>Date Created: {line.dateCreated}</Text>
             </TouchableOpacity>
         )
     }
@@ -79,7 +80,14 @@ const Styles = StyleSheet.create({
     },
     lineContainer: {
         padding: 30,
-        backgroundColor: '#DCDCDC',
-        marginBottom: 10
+        backgroundColor: '#FFF',
+        borderColor: '#000',
+        marginBottom: 10,
+        margin: 10,
+        borderRadius: 3,
+        elevation: 3
+    },
+    lineContainerText:{
+        fontSize: 18
     }
 })

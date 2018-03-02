@@ -43,9 +43,9 @@ export default class LineManagersList extends React.Component {
     renderRow(lineManager) {
         return (
             <View style={Styles.lineManagerContainer}>
-                <Text>First Name: {lineManager.firstName}</Text>
-                <Text>Last Name: {lineManager.lastName}</Text>
-                <Text>Date Created: {lineManager.dateCreated}</Text>
+                <Text style={Styles.lineManagerContainerText}>First Name: {lineManager.firstName}</Text>
+                <Text style={Styles.lineManagerContainerText}>Last Name: {lineManager.lastName}</Text>
+                <Text style={Styles.lineManagerContainerText}>Date Created: {lineManager.dateCreated}</Text>
             </View>
         )
     }
@@ -78,7 +78,14 @@ const Styles = StyleSheet.create({
     },
     lineManagerContainer: {
         padding: 30,
-        backgroundColor: '#DCDCDC',
-        marginBottom: 10
+        backgroundColor: '#FFF',
+        borderColor: '#000',
+        marginBottom: 10,
+        margin: 10,
+        borderRadius: 3,
+        elevation: 3
+    },
+    lineManagerContainerText: {
+        fontSize: 18
     }
 })

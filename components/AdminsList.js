@@ -30,7 +30,6 @@ export default class AdminsList extends React.Component {
         var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=admins';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
-                debugger;
                 this.setState({
                     loaded:true,
                     dataSource: this.state.dataSource.cloneWithRows(responseJson)
@@ -44,9 +43,9 @@ export default class AdminsList extends React.Component {
     renderRow(admin){
         return (
             <View style={Styles.adminContainer}>
-                <Text>First Name: {admin.firstName}</Text>
-                <Text>Last Name: {admin.lastName}</Text>
-                <Text>Date Created: {admin.dateCreated}</Text>
+                <Text style={Styles.adminContainerText}>First Name: {admin.firstName}</Text>
+                <Text style={Styles.adminContainerText}>Last Name: {admin.lastName}</Text>
+                <Text style={Styles.adminContainerText}>Date Created: {admin.dateCreated}</Text>
             </View>
         )
     }
@@ -78,9 +77,16 @@ const Styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center'
     },
-    adminContainer:{
+    adminContainer: {
         padding: 30,
-        backgroundColor: '#DCDCDC',
-        marginBottom: 10
+        backgroundColor: '#FFF',
+        borderColor: '#000',
+        marginBottom: 10,
+        margin: 10,
+        borderRadius: 3,
+        elevation: 3
+    },
+    adminContainerText: {
+        fontSize: 18
     }
 })
