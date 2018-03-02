@@ -5,13 +5,15 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
-    "android": "react-native run-android"
+    "android": "react-native run-android",
+    "postinstall": "rm ./node_modules/react-native/local-cli/core/__fixtures__/files/package.json"
   },
   "dependencies": {
     "react": "16.2.0",
     "react-native": "0.53.3",
     "react-native-menu": "^0.23.0",
     "react-native-popup-menu": "^0.12.2",
+    "react-native-vector-icons": "^4.5.0",
     "react-navigation": "^1.2.1"
   },
   "devDependencies": {

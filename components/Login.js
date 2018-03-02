@@ -33,6 +33,8 @@ export default class LoginScreen extends Component {
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
+    userName = "JPritchard9518"
+    password = "Jp918136!"
     var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/validateLineManager?userName=' + userName + '&password=' + password;
     return fetch(url).then((response) => response.json())
       .then((responseJson) => {

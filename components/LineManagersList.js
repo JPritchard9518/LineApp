@@ -4,11 +4,12 @@ import {
     Text,
     View,
     Image,
-    ListView
+    ListView,
+    ActivityIndicator
 } from 'react-native'
 import config from '../config.json';
 
-export default class LineManagers extends React.Component {
+export default class LineManagersList extends React.Component {
     static navigationOptions = {
         title: 'Line Mangers',
         headerTitleStyle: {
@@ -21,7 +22,7 @@ export default class LineManagers extends React.Component {
         this.state = {
             lineManagers: [],
             dataSource: ds,
-
+            loaded:false,
         };
     }
     componentDidMount() {
@@ -30,6 +31,7 @@ export default class LineManagers extends React.Component {
             .then((responseJson) => {
                 debugger;
                 this.setState({
+                    loaded:true,
                     dataSource: this.state.dataSource.cloneWithRows(responseJson)
                 })
 
@@ -48,13 +50,20 @@ export default class LineManagers extends React.Component {
         )
     }
     render() {
-        // Add loading view
-        return (
-            <ListView
-                style={Styles.container}
-                dataSource={this.state.dataSource}
-                renderRow={(data) => this.renderRow(data)} />
-        )
+        if(this.state.loaded){
+            return (
+                <ListView
+                    style={Styles.container}
+                    dataSource={this.state.dataSource}
+                    renderRow={(data) => this.renderRow(data)} />
+            )
+        }else{
+            return (
+                <View style={Styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+            )
+        }
     }
 }
 
@@ -62,7 +71,10 @@ const Styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        marginTop: 20
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center'
     },
     lineManagerContainer: {
         padding: 30,

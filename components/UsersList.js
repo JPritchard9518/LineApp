@@ -4,11 +4,12 @@ import {
     Text,
     View,
     Image,
-    ListView
+    ListView,
+    ActivityIndicator
 } from 'react-native'
 import config from '../config.json';
 
-export default class Users extends React.Component {
+export default class UsersList extends React.Component {
     static navigationOptions = {
         title: 'Users',
         headerTitleStyle: {
@@ -21,6 +22,7 @@ export default class Users extends React.Component {
         this.state = {
             users: [],
             dataSource: ds,
+            loaded:false
 
         };
     }
@@ -30,6 +32,7 @@ export default class Users extends React.Component {
             .then((responseJson) => {
                 debugger;
                 this.setState({
+                    loaded:true,
                     dataSource: this.state.dataSource.cloneWithRows(responseJson)
                 })
 
@@ -54,12 +57,21 @@ export default class Users extends React.Component {
         )
     }
     render() {
-        return (
-            <ListView
-                style={Styles.container}
-                dataSource={this.state.dataSource}
-                renderRow={(data) => this.renderRow(data)} />
-        )
+        if(this.state.loaded){
+            return (
+                <ListView
+                    style={Styles.container}
+                    dataSource={this.state.dataSource}
+                    renderRow={(data) => this.renderRow(data)} />
+            )
+        }else{
+            return (
+                <View style={Styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+            )
+        }
+        
     }
 }
 
@@ -67,7 +79,10 @@ const Styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        marginTop: 20
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center'
     },
     userContainer: {
         padding: 30,
