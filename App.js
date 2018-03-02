@@ -7,8 +7,7 @@ import UsersList from './components/UsersList.js'
 import LineManagersList from './components/LineManagersList.js'
 import LinesList from './components/LinesList.js'
 import Line from './components/Line.js'
-import Icon from 'react-native-vector-icons/FontAwesome';
-
+import Icon from 'react-native-vector-icons/FontAwesome'; // https://github.com/oblador/react-native-vector-icons
 
 // https://reactnavigation.org/
 // https://shift.infinite.red/react-navigation-drawer-tutorial-a802fc3ee6dc

@@ -7,11 +7,8 @@ import {
   Button,
   Keyboard
 } from 'react-native';
-import { StackNavigator } from 'react-navigation'; // 1.0.0-beta.27
+import { StackNavigator } from 'react-navigation';
 import config from '../config.json';
-// import Home from './components/Home.js';
-
-
 
 export default class LoginScreen extends Component {
   static navigationOptions = {
