@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, TouchableHighlight } from 'react-native'
+import { Text, TouchableOpacity } from 'react-native'
 import { StackNavigator, DrawerNavigator } from 'react-navigation'
 import LoginScreen from './components/Login.js'
 import AdminsList from './components/AdminsList.js'
@@ -8,6 +8,10 @@ import LineManagersList from './components/LineManagersList.js'
 import LinesList from './components/LinesList.js'
 import Line from './components/Line.js'
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+
+// https://reactnavigation.org/
+// https://shift.infinite.red/react-navigation-drawer-tutorial-a802fc3ee6dc
 
 const LineStack = StackNavigator({
   "Lines": {screen: LinesList},
@@ -23,9 +27,6 @@ const DrawerStack = DrawerNavigator({
   "Users": { screen: UsersList },
   "Line Mangers": { screen: LineManagersList },
 })
-// https://reactnavigation.org/
-// https://shift.infinite.red/react-navigation-drawer-tutorial-a802fc3ee6dc
-
 
 const DrawerNavigation = StackNavigator({
   DrawerStack: { screen: DrawerStack }
@@ -33,7 +34,13 @@ const DrawerNavigation = StackNavigator({
     headerMode: 'float',
     navigationOptions: ({ navigation }) => ({
       headerStyle: { backgroundColor: '#0288D1' },
-      headerLeft: <Icon name="bars" size={25} style={{ marginLeft: 15, color: "#FFF" }} onPress={() => (navigation.state.index === 0) ? navigation.navigate('DrawerOpen') : navigation.navigate('DrawerClose')} />
+      headerLeft: <Icon name="bars" size={25} style={{ marginLeft: 15, color: "#FFF" }} onPress={() => (navigation.state.index === 0) ? navigation.navigate('DrawerOpen') : navigation.navigate('DrawerClose')} />,
+      headerRight: (
+        <TouchableOpacity
+          onPress={() => navigation.navigate({ routeName: 'loginStack' })}
+          style={{ marginRight: 15, borderColor: '#FFF'}}
+        ><Text style={{color: "#FFF", fontWeight: "700", fontSize: 15}}>Logout</Text></TouchableOpacity>
+      ),
     })
   })
 
@@ -44,8 +51,7 @@ const LoginStack = StackNavigator({
     headerMode: 'float',
     navigationOptions: {
       headerStyle: { backgroundColor: '#C02C33' },
-      title: 'You are not logged in'
-    }
+    },
   })
 
 // Manifest of possible screens
@@ -56,7 +62,7 @@ const PrimaryNav = StackNavigator({
     // Default config for all screens
     headerMode: 'none',
     title: 'Main',
-    initialRouteName: 'loginStack'
+    initialRouteName: 'loginStack',
   })
 
 export default PrimaryNav
