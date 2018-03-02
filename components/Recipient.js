@@ -1,0 +1,130 @@
+import React from 'react'
+import {
+    StyleSheet,
+    Text,
+    View,
+    Image,
+    ListView,
+    TouchableOpacity,
+    ActivityIndicator
+} from 'react-native'
+import config from '../config.json';
+
+export default class Recipient extends React.Component {
+    static navigationOptions = ({ navigation }) => {
+        const { params } = navigation.state;
+        return {
+            title: params ? params.recipient.name : 'Recipient',
+            headerTitleStyle: {
+                color: '#FFF',
+            },
+        }
+    };
+    constructor(props) {
+        super(props)
+        const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+        this.state = {
+            recipient: this.props.navigation.state.params.recipient,
+            errorMessage: '',
+            dataSource: ds,
+            loaded: false
+        };
+    }
+    componentDidMount() {
+        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveRecipientActions?recipientID=' + this.state.recipient._id;
+        return fetch(url).then((response) => response.json())
+            .then((responseJson) => {
+                // Add error checking
+                this.setState({
+                    loaded: true,
+                    dataSource: this.state.dataSource.cloneWithRows(responseJson.recipientActions.actions)
+                })
+
+            })
+            .catch((error) => {
+                this.setState({ errorMessage: error })
+            });
+    }
+    renderRow(data){
+        return(
+            <View style={Styles.actionContainer}>
+                <Text>Date: {data.date}</Text>
+                <Text>Line ID: {data.lineID}</Text>
+                <Text>Resource: {data.resource}</Text>
+                <Text>Number Taken: {data.numTaken}</Text>
+            </View>
+        )
+
+    }
+    renderRecipientActions(){
+        if(this.state.loaded){
+            return (
+                <ListView
+                    style={Styles.listContainer}
+                    dataSource={this.state.dataSource}
+                    renderRow={(data) => this.renderRow(data)} />
+            )
+        }else{
+            return (
+                <View style={Styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+            )
+        }
+
+    }
+    render() {
+        return (
+            <View style={Styles.container}>
+                <View style={Styles.lineInfo}>
+                    <Text style={Styles.recipientAttribute}>First Name: {this.state.recipient.firstName}</Text>
+                    <Text style={Styles.recipientAttribute}>Last Name: {this.state.recipient.lastName}</Text>
+                    <Text style={Styles.recipientAttribute}>Date Created: {this.state.recipient.dateCreated}</Text>
+                    <Text style={Styles.recipientAttribute}>Family Members: {this.state.recipient.familyMembers.length}</Text>
+                </View>
+                {this.renderRecipientActions()}
+                <Text>{this.state.errorMessage}</Text>
+            </View>
+        )
+    }
+}
+
+const Styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        justifyContent: 'space-between'
+    },
+    lineInfo: {
+        justifyContent: 'space-between',
+        padding: 20,
+    },
+    recipientAttribute: {
+        fontSize: 20
+    },
+    accessButton: {
+        backgroundColor: '#689F38',
+        padding: 10,
+        width: 200,
+        borderRadius: 5,
+        alignItems: 'center',
+        alignSelf: 'center',
+        marginBottom: 25
+    },
+    accessButtonText: {
+        color: '#FFF'
+    },
+    actionContainer: {
+        padding: 30,
+        backgroundColor: '#DCDCDC',
+        marginBottom: 10
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center'
+    },
+    listContainer:{
+        flex:1,
+        backgroundColor: '#FFF'
+    }
+})

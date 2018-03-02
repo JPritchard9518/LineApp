@@ -5,13 +5,14 @@ import {
     View,
     Image,
     ListView,
-    ActivityIndicator
+    ActivityIndicator,
+    TouchableOpacity
 } from 'react-native'
 import config from '../config.json';
 
-export default class UsersList extends React.Component {
+export default class RecipientsList extends React.Component {
     static navigationOptions = {
-        title: 'Users',
+        title: 'Recipients',
         headerTitleStyle: {
             color: '#FFF',
         },
@@ -20,17 +21,15 @@ export default class UsersList extends React.Component {
         super(props)
         const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
         this.state = {
-            users: [],
             dataSource: ds,
             loaded:false
 
         };
     }
     componentDidMount() {
-        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=users';
+        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=recipients';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
-                debugger;
                 this.setState({
                     loaded:true,
                     dataSource: this.state.dataSource.cloneWithRows(responseJson)
@@ -41,19 +40,19 @@ export default class UsersList extends React.Component {
                 this.setState({ errorMessage: error })
             });
     }
-    renderRow(user) {
+    renderRow(recipient) {
         return (
-            <View style={Styles.userContainer}>
-                <Text>First Name: {user.firstName}</Text>
-                <Text>Last Name: {user.lastName}</Text>
-                <Text>Country: {user.country}</Text>
-                <Text>Language(s): {user.languages}</Text>
-                <Text>Case Number: {user.caseNumber}</Text>
-                <Text>Housing Location: {user.housingLocation}</Text>
-                <Text>Special Needs: {user.specialNeeds}</Text>
-                <Text>Family Members: {user.familyMembers.length}</Text>
-                <Text>Date Created: {user.dateCreated}</Text>
-            </View>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient',{recipient:recipient})} style={Styles.recipientContainer}>
+                <Text>First Name: {recipient.firstName}</Text>
+                <Text>Last Name: {recipient.lastName}</Text>
+                <Text>Country: {recipient.country}</Text>
+                <Text>Language(s): {recipient.languages}</Text>
+                <Text>Case Number: {recipient.caseNumber}</Text>
+                <Text>Housing Location: {recipient.housingLocation}</Text>
+                <Text>Special Needs: {recipient.specialNeeds}</Text>
+                <Text>Family Members: {recipient.familyMembers.length}</Text>
+                <Text>Date Created: {recipient.dateCreated}</Text>
+            </TouchableOpacity>
         )
     }
     render() {
@@ -84,7 +83,7 @@ const Styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center'
     },
-    userContainer: {
+    recipientContainer: {
         padding: 30,
         backgroundColor: '#DCDCDC',
         marginBottom: 10

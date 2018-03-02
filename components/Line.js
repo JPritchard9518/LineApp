@@ -23,12 +23,13 @@ export default class Line extends React.Component {
         super(props)
         this.state = {
             line: this.props.navigation.state.params.line,
-            errorMessage:''
+            errorMessage:'',
+            currentRecipientID: "5a995fd737449d965cf8e98b"
         };
         this.attemptLineAccess = this.attemptLineAccess.bind(this);
     }
     attemptLineAccess(){
-        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/attemptLineAccess?lineID=' + this.state.line._id;
+        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/attemptLineAccess?lineID=' + this.state.line._id + '&recipientID=' + this.state.currentRecipientID;
         return fetch(url,{method:"POST"}).then((response) => response.json())
             .then((responseJson) => {
                 if(responseJson.success){
@@ -36,7 +37,7 @@ export default class Line extends React.Component {
                         line: responseJson.line
                     })
                 }else{
-                    // User was not granted access
+                    // Recipient was not granted access
                 }
             })
             .catch((error) => {
@@ -53,6 +54,7 @@ export default class Line extends React.Component {
                     <Text style={Styles.lineAttribute}>Open - Close: {this.state.line.openCloseTime}</Text>
                 </View>
                 <Text>{this.state.errorMessage}</Text>
+                <Text>Recipient Currently Accessing: {this.state.currentRecipientID}</Text>
                 <TouchableOpacity style={Styles.accessButton} onPress={() => this.attemptLineAccess()}>
                     <Text style={Styles.accessButtonText}>Access Line</Text>
                 </TouchableOpacity>

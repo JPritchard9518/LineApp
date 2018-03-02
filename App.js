@@ -3,7 +3,8 @@ import { Text, TouchableOpacity } from 'react-native'
 import { StackNavigator, DrawerNavigator } from 'react-navigation'
 import LoginScreen from './components/Login.js'
 import AdminsList from './components/AdminsList.js'
-import UsersList from './components/UsersList.js'
+import RecipientsList from './components/RecipientsList.js'
+import Recipient from './components/Recipient.js'
 import LineManagersList from './components/LineManagersList.js'
 import LinesList from './components/LinesList.js'
 import Line from './components/Line.js'
@@ -11,7 +12,13 @@ import Icon from 'react-native-vector-icons/FontAwesome'; // https://github.com/
 
 // https://reactnavigation.org/
 // https://shift.infinite.red/react-navigation-drawer-tutorial-a802fc3ee6dc
-
+const RecipientStack = StackNavigator({
+  "Recipients": {screen: RecipientsList},
+  "Recipient": {screen: Recipient}
+},{
+    headerMode: 'none',
+    initialRouteName: 'Recipients'
+})
 const LineStack = StackNavigator({
   "Lines": {screen: LinesList},
   "Line": {screen: Line}
@@ -23,7 +30,7 @@ const LineStack = StackNavigator({
 const DrawerStack = DrawerNavigator({
   "Lines": { screen: LineStack },
   "Admins": { screen: AdminsList },
-  "Users": { screen: UsersList },
+  "Recipients": { screen: RecipientStack },
   "Line Mangers": { screen: LineManagersList },
 })
 
