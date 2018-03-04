@@ -48,10 +48,10 @@ export default class Recipient extends React.Component {
     renderRow(data){
         return(
             <View style={Styles.actionContainer}>
-                <Text>Date: {data.date}</Text>
-                <Text>Line ID: {data.lineID}</Text>
-                <Text>Resource: {data.resource}</Text>
-                <Text>Number Taken: {data.numTaken}</Text>
+                <Text style={Styles.actionContainerText}>Date: {data.date}</Text>
+                <Text style={Styles.actionContainerText}>Line ID: {data.lineID}</Text>
+                <Text style={Styles.actionContainerText}>Resource: {data.resource}</Text>
+                <Text style={Styles.actionContainerText}>Number Taken: {data.numTaken}</Text>
             </View>
         )
 
@@ -114,11 +114,6 @@ const Styles = StyleSheet.create({
     accessButtonText: {
         color: '#FFF'
     },
-    actionContainer: {
-        padding: 30,
-        backgroundColor: '#DCDCDC',
-        marginBottom: 10
-    },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center'
@@ -126,5 +121,17 @@ const Styles = StyleSheet.create({
     listContainer:{
         flex:1,
         backgroundColor: '#FFF'
+    },
+    actionContainer: {
+        padding: 30,
+        backgroundColor: '#FFF',
+        borderColor: '#000',
+        marginBottom: 10,
+        margin: 10,
+        borderRadius: 3,
+        elevation: 3
+    },
+    actionContainerText: {
+        fontSize: 18
     }
 })

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, TouchableOpacity } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 import { StackNavigator, DrawerNavigator } from 'react-navigation'
 import LoginScreen from './components/Login.js'
 import AdminsList from './components/AdminsList.js'
@@ -8,10 +8,12 @@ import Recipient from './components/Recipient.js'
 import LineManagersList from './components/LineManagersList.js'
 import LinesList from './components/LinesList.js'
 import Line from './components/Line.js'
+import EditRecord from './components/EditRecord.js'
 import Icon from 'react-native-vector-icons/FontAwesome'; // https://github.com/oblador/react-native-vector-icons
 
 // https://reactnavigation.org/
 // https://shift.infinite.red/react-navigation-drawer-tutorial-a802fc3ee6dc
+// https://shift.infinite.red/react-navigation-drawer-tutorial-part-2-9c382217ac6b
 const RecipientStack = StackNavigator({
   "Recipients": {screen: RecipientsList},
   "Recipient": {screen: Recipient}
@@ -21,7 +23,8 @@ const RecipientStack = StackNavigator({
 })
 const LineStack = StackNavigator({
   "Lines": {screen: LinesList},
-  "Line": {screen: Line}
+  "Line": {screen: Line},
+  "EditRecord": {screen: EditRecord}
 },{
     headerMode: 'none',
     initialRouteName: 'Lines'
@@ -31,7 +34,7 @@ const DrawerStack = DrawerNavigator({
   "Lines": { screen: LineStack },
   "Admins": { screen: AdminsList },
   "Recipients": { screen: RecipientStack },
-  "Line Mangers": { screen: LineManagersList },
+  "Line Managers": { screen: LineManagersList },
 })
 
 const DrawerNavigation = StackNavigator({
@@ -40,7 +43,7 @@ const DrawerNavigation = StackNavigator({
     headerMode: 'float',
     navigationOptions: ({ navigation }) => ({
       headerStyle: { backgroundColor: '#0288D1' },
-      headerLeft: <Icon name="bars" size={25} style={{ marginLeft: 15, color: "#FFF" }} onPress={() => (navigation.state.index === 0) ? navigation.navigate('DrawerOpen') : navigation.navigate('DrawerClose')} />,
+      headerLeft: <View style={{ flexDirection: 'row' }}><Icon name="bars" size={25} style={{ marginLeft: 15, color: "#FFF" }} onPress={() => navigation.navigate('DrawerToggle')} /></View>,
       headerRight: (
         <TouchableOpacity
           onPress={() => navigation.navigate({ routeName: 'loginStack' })}

@@ -22,7 +22,7 @@ export default class LinesList extends React.Component {
         const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
         this.state = {
             dataSource: ds,
-            loaded: false
+            loaded: false,
         };
     }
     componentDidMount() {
@@ -40,7 +40,6 @@ export default class LinesList extends React.Component {
             });
     }
     renderRow(line) {
-        debugger;
         return (
             <TouchableOpacity onPress={() => this.props.navigation.navigate('Line',{line:line})} style={Styles.lineContainer}>
                 <Text style={Styles.lineContainerText}>Line Name: {line.name}</Text>

@@ -11,7 +11,7 @@ import config from '../config.json';
 
 export default class LineManagersList extends React.Component {
     static navigationOptions = {
-        title: 'Line Mangers',
+        title: 'Line Managers',
         headerTitleStyle: {
             color: '#FFF',
         },

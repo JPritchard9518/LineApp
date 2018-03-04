@@ -8,6 +8,7 @@ import {
     TouchableOpacity
 } from 'react-native'
 import config from '../config.json';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class Line extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -47,17 +48,23 @@ export default class Line extends React.Component {
     render() {
         return (
             <View style={Styles.container}>
-                <View style={Styles.lineInfo}>
-                    <Text style={Styles.lineAttribute}>Name: {this.state.line.name}</Text>
-                    <Text style={Styles.lineAttribute}>Resource: {this.state.line.resource}</Text>
-                    <Text style={Styles.lineAttribute}>Capacity: {this.state.line.currentCapacity}/{this.state.line.capacity}</Text>
-                    <Text style={Styles.lineAttribute}>Open - Close: {this.state.line.openCloseTime}</Text>
+                <Icon name="angle-left" size={35} style={Styles.backButton} onPress={() => this.props.navigation.goBack()} />
+                <View style={Styles.contentContainer}>
+                    <View style={Styles.lineInfo}>
+                        <Text style={Styles.lineAttribute}>Name: {this.state.line.name}</Text>
+                        <Text style={Styles.lineAttribute}>Resource: {this.state.line.resource}</Text>
+                        <Text style={Styles.lineAttribute}>Capacity: {this.state.line.currentCapacity}/{this.state.line.capacity}</Text>
+                        <Text style={Styles.lineAttribute}>Open - Close: {this.state.line.openCloseTime}</Text>
+                    </View>
+                    <Text>{this.state.errorMessage}</Text>
+                    <Text style={{width: '75%', alignSelf: 'center', fontSize: 20}}>Recipient Currently Accessing: {this.state.currentRecipientID}</Text>
+                    <TouchableOpacity style={Styles.accessButton} onPress={() => this.attemptLineAccess()}>
+                        <Text style={Styles.accessButtonText}>Access Line</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: this.state.line })}>
+                        <Text style={Styles.accessButtonText}>Edit Line</Text>
+                    </TouchableOpacity>
                 </View>
-                <Text>{this.state.errorMessage}</Text>
-                <Text style={{width: '75%', alignSelf: 'center', fontSize: 20}}>Recipient Currently Accessing: {this.state.currentRecipientID}</Text>
-                <TouchableOpacity style={Styles.accessButton} onPress={() => this.attemptLineAccess()}>
-                    <Text style={Styles.accessButtonText}>Access Line</Text>
-                </TouchableOpacity>
             </View>
         )
     }
@@ -67,11 +74,16 @@ const Styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+    },
+    contentContainer:{
+        flex: 1,
+        flexDirection: 'column',
         justifyContent: 'space-between'
     },
     lineInfo:{
         justifyContent: 'space-between',
         padding: 20,
+        // alignSelf: 'flex-start'
     },
     lineAttribute:{
         fontSize: 20
@@ -83,9 +95,14 @@ const Styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
         alignSelf: 'center',
-        marginBottom: 25
+        marginBottom: 25,
+        justifyContent:'flex-end'
     },
     accessButtonText:{
         color: '#FFF'
+    },
+    backButton: {
+        padding: 10,
+        color: "#000"
     }
 })
