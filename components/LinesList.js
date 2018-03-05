@@ -42,7 +42,7 @@ export default class LinesList extends React.Component {
     renderRow(line) {
         return (
             <TouchableOpacity onPress={() => this.props.navigation.navigate('Line',{line:line})} style={Styles.lineContainer}>
-                <Text style={Styles.lineContainerText}>Line Name: {line.name}</Text>
+                <Text style={[Styles.lineContainerText,{fontSize: 25}]}>Line Name: {line.name}</Text>
                 <Text style={Styles.lineContainerText}>Resource: {line.resource}</Text>
                 <Text style={Styles.lineContainerText}>Capacity: {line.currentCapacity}/{line.capacity}</Text>
                 <Text style={Styles.lineContainerText}>Open - Close: {line.openCloseTime}</Text>
@@ -84,9 +84,9 @@ const Styles = StyleSheet.create({
         marginBottom: 10,
         margin: 10,
         borderRadius: 3,
-        elevation: 3
+        elevation: 3,
     },
     lineContainerText:{
-        fontSize: 18
+        fontSize: 18,
     }
 })

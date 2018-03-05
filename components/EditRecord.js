@@ -11,7 +11,6 @@ import {
     Keyboard
 } from 'react-native'
 import config from '../config.json';
-import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class EditRecord extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -75,7 +74,6 @@ export default class EditRecord extends React.Component {
     render() {
         return (
             <View style={Styles.container}>
-                <Icon name="angle-left" size={25} style={{ marginLeft: 15, color: "#000" }} onPress={() => this.props.navigation.goBack()} />
                 <ScrollView style={Styles.scrollView}>
                     {this.state.recordKeys.map((key,index) => this.renderTextInput(key,index))}
                 </ScrollView>

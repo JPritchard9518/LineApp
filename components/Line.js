@@ -8,7 +8,6 @@ import {
     TouchableOpacity
 } from 'react-native'
 import config from '../config.json';
-import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class Line extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -48,7 +47,6 @@ export default class Line extends React.Component {
     render() {
         return (
             <View style={Styles.container}>
-                <Icon name="angle-left" size={35} style={Styles.backButton} onPress={() => this.props.navigation.goBack()} />
                 <View style={Styles.contentContainer}>
                     <View style={Styles.lineInfo}>
                         <Text style={Styles.lineAttribute}>Name: {this.state.line.name}</Text>
@@ -58,12 +56,14 @@ export default class Line extends React.Component {
                     </View>
                     <Text>{this.state.errorMessage}</Text>
                     <Text style={{width: '75%', alignSelf: 'center', fontSize: 20}}>Recipient Currently Accessing: {this.state.currentRecipientID}</Text>
-                    <TouchableOpacity style={Styles.accessButton} onPress={() => this.attemptLineAccess()}>
-                        <Text style={Styles.accessButtonText}>Access Line</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: this.state.line })}>
-                        <Text style={Styles.accessButtonText}>Edit Line</Text>
-                    </TouchableOpacity>
+                    <View style={Styles.buttonContainer}>
+                        <TouchableOpacity style={Styles.accessButton} onPress={() => this.attemptLineAccess()}>
+                            <Text style={Styles.accessButtonText}>Access Line</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: this.state.line })}>
+                            <Text style={Styles.accessButtonText}>Edit Line</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         )
@@ -83,10 +83,12 @@ const Styles = StyleSheet.create({
     lineInfo:{
         justifyContent: 'space-between',
         padding: 20,
-        // alignSelf: 'flex-start'
     },
     lineAttribute:{
         fontSize: 20
+    },
+    buttonContainer:{
+        // justifyContent: 'flex-end'
     },
     accessButton:{
         backgroundColor: '#689F38',
@@ -96,13 +98,9 @@ const Styles = StyleSheet.create({
         alignItems: 'center',
         alignSelf: 'center',
         marginBottom: 25,
-        justifyContent:'flex-end'
+        justifyContent:'flex-end',
     },
     accessButtonText:{
         color: '#FFF'
     },
-    backButton: {
-        padding: 10,
-        color: "#000"
-    }
 })
