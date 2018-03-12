@@ -35,6 +35,9 @@ export default class EditRecord extends React.Component {
         }
         
     }
+    componentWillReceiveProps(){
+        navigationOptions.title = this.state.record.name;
+    }
     saveRecord(){
         Keyboard.dismiss()
         var data = JSON.stringify(this.state.record)
@@ -44,6 +47,7 @@ export default class EditRecord extends React.Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     if (responseJson.success) {
+                        this.props.navigation.state.params.returnData(responseJson.record);
                         this.setState({
                             record: responseJson.record
                         })

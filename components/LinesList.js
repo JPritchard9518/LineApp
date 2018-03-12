@@ -47,6 +47,7 @@ export default class LinesList extends React.Component {
                 <Text style={Styles.lineContainerText}>Capacity: {line.currentCapacity}/{line.capacity}</Text>
                 <Text style={Styles.lineContainerText}>Open - Close: {line.openCloseTime}</Text>
                 <Text style={Styles.lineContainerText}>Date Created: {line.dateCreated}</Text>
+                <Text style={Styles.lineContainerText}>Access Frequency: {line.accessFrequency} hrs</Text>
             </TouchableOpacity>
         )
     }
