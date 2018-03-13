@@ -50,6 +50,7 @@ export default class Recipient extends React.Component {
             <View style={Styles.actionContainer}>
                 <Text style={Styles.actionContainerText}>Date: {data.date}</Text>
                 <Text style={Styles.actionContainerText}>Line ID: {data.lineID}</Text>
+                <Text style={Styles.actionContainerText}>Line Name: {data.lineName}</Text>
                 <Text style={Styles.actionContainerText}>Resource: {data.resource}</Text>
                 <Text style={Styles.actionContainerText}>Number Taken: {data.numTaken}</Text>
             </View>
@@ -97,22 +98,16 @@ const Styles = StyleSheet.create({
     },
     lineInfo: {
         justifyContent: 'space-between',
-        padding: 20,
+        paddingTop: 20,
+        paddingBottom: 20,
+        marginLeft: 20,
+        marginRight: 20,
+        borderBottomColor: '#000',
+        borderBottomWidth: 1,
+        marginBottom: 20
     },
     recipientAttribute: {
         fontSize: 20
-    },
-    accessButton: {
-        backgroundColor: '#689F38',
-        padding: 10,
-        width: 200,
-        borderRadius: 5,
-        alignItems: 'center',
-        alignSelf: 'center',
-        marginBottom: 25
-    },
-    accessButtonText: {
-        color: '#FFF'
     },
     loadingContainer: {
         flex: 1,

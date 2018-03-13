@@ -31,6 +31,7 @@ export default class Line extends React.Component {
             currentSuccess: {},
             faultType: '',
             remainingAttempts: 3, // For rescanning a fingerprint when credentials were not found.
+            recipient: {},
             currentRecipientID: "5a995fd737449d965cf8e98b" // Need to update this once finger is scanned
         };
         this.attemptLineAccess = this.attemptLineAccess.bind(this);
@@ -54,8 +55,10 @@ export default class Line extends React.Component {
                         accessFault: false,
                         accessSuccess: true,
                         currentSuccess: responseJson.accessSuccess,
+                        currentFault: {},
                         faultType: '',
                         remainingAttempts: 3,
+                        recipient: responseJson.recipient
                     })
                 }else{
                     var remainingAttempts = this.state.remainingAttempts;
@@ -65,8 +68,10 @@ export default class Line extends React.Component {
                         accessFault:true,
                         accessSuccess: false,
                         currentFault: responseJson.accessFault || {},
+                        currentSuccess: {},
                         faultType: responseJson.type,
-                        remainingAttempts: remainingAttempts
+                        remainingAttempts: remainingAttempts,
+                        recipient: responseJson.recipient,
                     })
                 }
             })
@@ -86,26 +91,30 @@ export default class Line extends React.Component {
             var minutes = Math.floor((timeDiff / (1000 * 60)) % 60);
             var hours = Math.floor(((timeDiff / (1000 * 60 * 60)) % 24));
             var timeString = hours.toFixed(0) + ' hours, ' +  minutes.toFixed(0) +  ' minutes, ' + seconds.toFixed(0) + ' seconds';
-            
             return(
                 <View style={Styles.faultContainer}>
-                    <Text style={[Styles.faultAttribute,{fontSize: 25}]}>Access Fault</Text>
-                    <Text style={Styles.faultAttribute}>Last Line Access: {moment(this.state.currentFault.date).format("MM/DD/YYYY hh:MM:SS A")}</Text>
-                    <Text style={Styles.faultAttribute}>Next Valid Access: {moment(validAccessDate).format("MM/DD/YYYY hh:MM:SS A")} ({timeString})</Text>
+                    <Text style={[Styles.attribute,{fontSize: 25}]}>Access Fault</Text>
+                    <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient', { recipient: this.state.recipient })}>
+                        <Text style={Styles.attribute}>Name: {this.state.recipient.firstName} {this.state.recipient.lastName}</Text>
+                        <Text style={Styles.attribute}>Language(s): {this.state.recipient.languages}</Text>
+                    </TouchableOpacity>
+                    <View style={{ borderBottomColor: '#FFF', borderBottomWidth: 1, marginTop: 20, marginBottom: 20 }} />
+                    <Text style={Styles.attribute}>Last Line Access: {moment(this.state.currentFault.date).format("MM/DD/YYYY hh:mm:ss A")}</Text>
+                    <Text style={Styles.attribute}>Next Valid Access: {moment(validAccessDate).format("MM/DD/YYYY hh:mm:ss A")} ({timeString})</Text>
                 </View>
             )
         }else if(this.state.faultType === 'credentialsNotFound'){
             return(
                 <View style={Styles.faultContainer}>
-                    <Text style={[Styles.faultAttribute,{fontSize: 25}]}>Credentials Not Found</Text>
-                    <Text style={[Styles.faultAttribute, { fontSize: 22 }]}>Please Try Again</Text>
-                    <Text style={Styles.faultAttribute}>Attempts Remaining: {this.state.remainingAttempts}</Text>
+                    <Text style={[Styles.attribute,{fontSize: 25}]}>Credentials Not Found</Text>
+                    <Text style={[Styles.attribute, { fontSize: 22 }]}>Please Try Again</Text>
+                    <Text style={Styles.attribute}>Attempts Remaining: {this.state.remainingAttempts}</Text>
                 </View>
             )
         }else if(this.state.faultType === 'maxAttemptsReached'){
             return(
                 <View style={Styles.faultContainer}>
-                    <Text style={[Styles.faultAttribute, { fontSize: 25 }]}>Access Denied: Maximum Attempts Have Been Reached</Text>
+                    <Text style={[Styles.attribute, Styles.headerText]}>Access Denied: Maximum Attempts Have Been Reached</Text>
                 </View>
             )
         }
@@ -119,9 +128,14 @@ export default class Line extends React.Component {
         var timeString = this.state.line.accessFrequency + ' hour(s) from now'
         return (
             <View style={Styles.successContainer}>
-                <Text style={[Styles.successAttribute, { fontSize: 25 }]}>Successful Access</Text>
-                <Text style={Styles.successAttribute}>Last Line Access: {moment(this.state.currentSuccess.date).format("DD/MM/YYYY hh:MM:SS A")}</Text>
-                <Text style={Styles.successAttribute}>Next Valid Access: {moment(validAccessDate).format("DD/MM/YYYY hh:MM:SS A")} ({timeString})</Text>
+                <Text style={[Styles.attribute, Styles.headerText]}>Successful Access</Text>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient',{recipient: this.state.recipient})}>
+                    <Text style={Styles.attribute}>Name: {this.state.recipient.firstName} {this.state.recipient.lastName}</Text>
+                    <Text style={Styles.attribute}>Language(s): {this.state.recipient.languages}</Text>
+                </TouchableOpacity>
+                <View style={{ borderBottomColor: '#FFF', borderBottomWidth: 1, marginTop: 20, marginBottom: 20 }}/>
+                <Text style={Styles.attribute}>Last Line Access: {moment(this.state.currentSuccess.date).format("MM/DD/YYYY hh:mm:ss A")}</Text>
+                <Text style={Styles.attribute}>Next Valid Access: {moment(validAccessDate).format("MM/DD/YYYY hh:mm:ss A")} ({timeString})</Text>
             </View>
         )
     }
@@ -130,20 +144,21 @@ export default class Line extends React.Component {
             <View style={Styles.container}>
                 <View style={Styles.contentContainer}>
                     <View style={Styles.lineInfo}>
-                        <Text style={Styles.lineAttribute}>Name: {this.state.line.name}</Text>
+                        <Text style={[Styles.lineAttribute, Styles.headerText]}>Name: {this.state.line.name}</Text>
                         <Text style={Styles.lineAttribute}>Resource: {this.state.line.resource}</Text>
                         <Text style={Styles.lineAttribute}>Capacity: {this.state.line.currentCapacity}/{this.state.line.capacity}</Text>
                         <Text style={Styles.lineAttribute}>Open - Close: {this.state.line.openCloseTime}</Text>
                         <Text style={Styles.lineAttribute}>Access Frequency: {this.state.line.accessFrequency} hrs</Text>
                     </View>
-                    <Text>{this.state.errorMessage}</Text>
+                    {/* <Text>{this.state.errorMessage}</Text> */}
                     {this.renderAccessFault()}
                     {this.renderAccessSuccess()}
-                    <Text style={{width: '75%', alignSelf: 'center', fontSize: 20}}>Recipient Currently Accessing: {this.state.currentRecipientID}</Text>
+                    {/* <Text style={{width: '75%', alignSelf: 'center', fontSize: 20}}>Recipient Currently Accessing: {this.state.currentRecipientID}</Text> */}
                     <View style={Styles.buttonContainer}>
                         <TouchableOpacity style={Styles.accessButton} onPress={() => this.attemptLineAccess()}>
                             <Text style={Styles.accessButtonText}>Access Line</Text>
                         </TouchableOpacity>
+                        <View style={{ borderLeftColor: '#FFF', borderLeftWidth: 1, marginTop: 0, marginLeft: 0 }} />
                         <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: this.state.line, returnData: this.returnData.bind(this)})}>
                             <Text style={Styles.accessButtonText}>Edit Line</Text>
                         </TouchableOpacity>
@@ -159,6 +174,9 @@ const Styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
+    headerText:{
+        fontSize: 25
+    },
     contentContainer:{
         flex: 1,
         flexDirection: 'column',
@@ -169,7 +187,7 @@ const Styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#C02C33'
     },
-    faultAttribute:{
+    attribute:{
         fontSize: 18,
         color: '#FFF'
     },
@@ -178,31 +196,36 @@ const Styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#689F38'
     },
-    successAttribute: {
+    attribute: {
         fontSize: 18,
         color: '#FFF'
     },
     lineInfo:{
         justifyContent: 'space-between',
-        padding: 20,
+        paddingTop: 20,
+        paddingBottom: 20,
+        borderBottomColor: '#000',
+        borderBottomWidth: 1,
+        marginLeft: 20,
+        marginRight: 20
     },
     lineAttribute:{
         fontSize: 20
     },
     buttonContainer:{
-        // justifyContent: 'flex-end'
+        flexDirection: 'row'
     },
     accessButton:{
         backgroundColor: '#689F38',
         padding: 10,
-        width: 200,
-        borderRadius: 5,
+        width: '50%',
+        height: 50,
         alignItems: 'center',
         alignSelf: 'center',
-        marginBottom: 25,
-        justifyContent:'flex-end',
+        justifyContent:'center',
     },
     accessButtonText:{
-        color: '#FFF'
+        color: '#FFF',
+        alignSelf: 'center'
     },
 })

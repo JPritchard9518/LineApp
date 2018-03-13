@@ -24,6 +24,7 @@ const RecipientStack = StackNavigator({
 const LineStack = StackNavigator({
   "Lines": {screen: LinesList},
   "Line": {screen: Line},
+  "Recipient": {screen: Recipient},
   "EditRecord": {screen: EditRecord}
 },{
     headerMode: 'none',
