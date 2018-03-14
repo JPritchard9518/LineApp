@@ -7,7 +7,8 @@ import {
     ListView,
     TouchableOpacity,
     ActivityIndicator
-} from 'react-native'
+} from 'react-native';
+import moment from 'moment';
 import config from '../config.json';
 
 export default class Recipient extends React.Component {
@@ -48,7 +49,7 @@ export default class Recipient extends React.Component {
     renderRow(data){
         return(
             <View style={Styles.actionContainer}>
-                <Text style={Styles.actionContainerText}>Date: {data.date}</Text>
+                <Text style={Styles.actionContainerText}>Date: {moment(data.date).format("MM/DD/YYYY hh:mm:ss A")}</Text>
                 <Text style={Styles.actionContainerText}>Line ID: {data.lineID}</Text>
                 <Text style={Styles.actionContainerText}>Line Name: {data.lineName}</Text>
                 <Text style={Styles.actionContainerText}>Resource: {data.resource}</Text>
@@ -80,7 +81,7 @@ export default class Recipient extends React.Component {
                 <View style={Styles.lineInfo}>
                     <Text style={Styles.recipientAttribute}>First Name: {this.state.recipient.firstName}</Text>
                     <Text style={Styles.recipientAttribute}>Last Name: {this.state.recipient.lastName}</Text>
-                    <Text style={Styles.recipientAttribute}>Date Created: {this.state.recipient.dateCreated}</Text>
+                    <Text style={Styles.recipientAttribute}>Date Created: {moment(this.state.recipient.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
                     <Text style={Styles.recipientAttribute}>Family Members: {this.state.recipient.familyMembers.length}</Text>
                 </View>
                 {this.renderRecipientActions()}

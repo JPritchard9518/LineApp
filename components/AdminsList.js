@@ -6,7 +6,8 @@ import {
     Image,
     ListView,
     ActivityIndicator
-} from 'react-native'
+} from 'react-native';
+import moment from 'moment';
 import config from '../config.json';
 
 export default class AdminsList extends React.Component {
@@ -45,7 +46,7 @@ export default class AdminsList extends React.Component {
             <View style={Styles.adminContainer}>
                 <Text style={Styles.adminContainerText}>First Name: {admin.firstName}</Text>
                 <Text style={Styles.adminContainerText}>Last Name: {admin.lastName}</Text>
-                <Text style={Styles.adminContainerText}>Date Created: {admin.dateCreated}</Text>
+                <Text style={Styles.adminContainerText}>Date Created: {moment(admin.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
             </View>
         )
     }

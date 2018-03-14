@@ -65,11 +65,13 @@ export default class EditRecord extends React.Component {
         this.setState({record: updatedRecord})
     }
     renderTextInput(key,index){
+        var keyboardType = (['capacity','currentCapacity'].indexOf(key) > -1) ? "numeric" : "default";
         return(
             <View key={key} style={Styles.inputContainer}>
                 <Text>{key}</Text>
                 <TextInput
-                    editable={!(key === '_id')}
+                    keyboardType={keyboardType}
+                    editable={!(key === '_id' || key === 'dateCreated')}
                     onChangeText={((newValue) => this.updateText(newValue,key))}
                     value={this.state.record[key].toString()}/>
             </View>

@@ -6,7 +6,8 @@ import {
     Image,
     ListView,
     ActivityIndicator
-} from 'react-native'
+} from 'react-native';
+import moment from 'moment';
 import config from '../config.json';
 
 export default class LineManagersList extends React.Component {
@@ -45,7 +46,8 @@ export default class LineManagersList extends React.Component {
             <View style={Styles.lineManagerContainer}>
                 <Text style={Styles.lineManagerContainerText}>First Name: {lineManager.firstName}</Text>
                 <Text style={Styles.lineManagerContainerText}>Last Name: {lineManager.lastName}</Text>
-                <Text style={Styles.lineManagerContainerText}>Date Created: {lineManager.dateCreated}</Text>
+                <Text style={Styles.lineManagerContainerText}>User Name: {lineManager.userName}</Text> 
+                <Text style={Styles.lineManagerContainerText}>Date Created: {moment(lineManager.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
             </View>
         )
     }

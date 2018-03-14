@@ -4,7 +4,7 @@ import {
   View,
   Text,
   TextInput,
-  Button,
+  TouchableOpacity,
   Keyboard
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
@@ -30,8 +30,6 @@ export default class LoginScreen extends Component {
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
-    userName = "JPritchard9518"
-    password = "Jp918136!"
     var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/validateLineManager?userName=' + userName + '&password=' + password;
     return fetch(url).then((response) => response.json())
       .then((responseJson) => {
@@ -63,10 +61,15 @@ export default class LoginScreen extends Component {
           onChangeText={((password) => this.setState({ password: password }))}
           secureTextEntry={true}
           placeholder="Password" />
+        <View style={{ marginTop: 20 }}>
+          <Text style={{fontSize:20}}>Testing Credentials:</Text>
+          <Text>User Name: testLM</Text>
+          <Text>Password: password123</Text>
+        </View>
         <View style={styles.buttonContainer}>
-          <Button
-            onPress={this.login}
-            title="Login" />
+          <TouchableOpacity style={styles.loginButton} onPress={() => this.login()}>
+            <Text style={styles.loginButtonText}>Login</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{this.state.errorMessage}</Text>
@@ -99,5 +102,19 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
-  }
+  },
+  loginButton: {
+    backgroundColor: '#689F38',
+    paddingLeft: 50,
+    paddingRight: 50,
+    // width: '50%',
+    height: 40,
+    alignItems: 'center',
+    alignSelf: 'center',
+    justifyContent: 'center',
+  },
+  loginButtonText: {
+    color: '#FFF',
+    alignSelf: 'center'
+  },
 });

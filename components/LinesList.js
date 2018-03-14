@@ -7,7 +7,8 @@ import {
     ListView,
     TouchableOpacity,
     ActivityIndicator,
-} from 'react-native'
+} from 'react-native';
+import moment from 'moment';
 import config from '../config.json';
 
 export default class LinesList extends React.Component {
@@ -46,7 +47,7 @@ export default class LinesList extends React.Component {
                 <Text style={Styles.lineContainerText}>Resource: {line.resource}</Text>
                 <Text style={Styles.lineContainerText}>Capacity: {line.currentCapacity}/{line.capacity}</Text>
                 <Text style={Styles.lineContainerText}>Open - Close: {line.openCloseTime}</Text>
-                <Text style={Styles.lineContainerText}>Date Created: {line.dateCreated}</Text>
+                <Text style={Styles.lineContainerText}>Date Created: {moment(line.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
                 <Text style={Styles.lineContainerText}>Access Frequency: {line.accessFrequency} hrs</Text>
             </TouchableOpacity>
         )

@@ -5,6 +5,7 @@ import LoginScreen from './components/Login.js'
 import AdminsList from './components/AdminsList.js'
 import RecipientsList from './components/RecipientsList.js'
 import Recipient from './components/Recipient.js'
+import NewRecipient from './components/NewRecipient.js'
 import LineManagersList from './components/LineManagersList.js'
 import LinesList from './components/LinesList.js'
 import Line from './components/Line.js'
@@ -30,14 +31,16 @@ const LineStack = StackNavigator({
     headerMode: 'none',
     initialRouteName: 'Lines'
 })
-// drawer stack (menu)
+// drawer menu routes
 const DrawerStack = DrawerNavigator({
   "Lines": { screen: LineStack },
   "Admins": { screen: AdminsList },
   "Recipients": { screen: RecipientStack },
   "Line Managers": { screen: LineManagersList },
+  "Add New Recipient": { screen: NewRecipient }
 })
 
+// Stack for Drawer Menu
 const DrawerNavigation = StackNavigator({
   DrawerStack: { screen: DrawerStack }
 }, {
@@ -54,7 +57,7 @@ const DrawerNavigation = StackNavigator({
     })
   })
 
-// login stack
+// Routes for login stack
 const LoginStack = StackNavigator({
   loginScreen: { screen: LoginScreen },
 }, {

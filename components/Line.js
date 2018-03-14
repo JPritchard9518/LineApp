@@ -5,7 +5,8 @@ import {
     View,
     Image,
     ListView,
-    TouchableOpacity
+    TouchableOpacity,
+    ScrollView
 } from 'react-native';
 import config from '../config.json';
 import moment from 'moment';
@@ -143,16 +144,19 @@ export default class Line extends React.Component {
         return (
             <View style={Styles.container}>
                 <View style={Styles.contentContainer}>
-                    <View style={Styles.lineInfo}>
-                        <Text style={[Styles.lineAttribute, Styles.headerText]}>Name: {this.state.line.name}</Text>
-                        <Text style={Styles.lineAttribute}>Resource: {this.state.line.resource}</Text>
-                        <Text style={Styles.lineAttribute}>Capacity: {this.state.line.currentCapacity}/{this.state.line.capacity}</Text>
-                        <Text style={Styles.lineAttribute}>Open - Close: {this.state.line.openCloseTime}</Text>
-                        <Text style={Styles.lineAttribute}>Access Frequency: {this.state.line.accessFrequency} hrs</Text>
-                    </View>
-                    {/* <Text>{this.state.errorMessage}</Text> */}
-                    {this.renderAccessFault()}
-                    {this.renderAccessSuccess()}
+                    <Text style={[Styles.lineAttribute, Styles.headerText, {marginLeft:20}]}>Name: {this.state.line.name}</Text>
+                    <ScrollView>
+                        <View style={Styles.lineInfo}>
+                            <Text style={Styles.lineAttribute}>Resource: {this.state.line.resource}</Text>
+                            <Text style={Styles.lineAttribute}>Capacity: {this.state.line.currentCapacity}/{this.state.line.capacity}</Text>
+                            <Text style={Styles.lineAttribute}>Open - Close: {this.state.line.openCloseTime}</Text>
+                            <Text style={Styles.lineAttribute}>Access Frequency: {this.state.line.accessFrequency} hrs</Text>
+                        </View>
+                        {/* <Text>{this.state.errorMessage}</Text> */}
+                    
+                        {this.renderAccessFault()}
+                        {this.renderAccessSuccess()}
+                    </ScrollView>
                     {/* <Text style={{width: '75%', alignSelf: 'center', fontSize: 20}}>Recipient Currently Accessing: {this.state.currentRecipientID}</Text> */}
                     <View style={Styles.buttonContainer}>
                         <TouchableOpacity style={Styles.accessButton} onPress={() => this.attemptLineAccess()}>
@@ -175,7 +179,7 @@ const Styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     headerText:{
-        fontSize: 25
+        fontSize: 25,
     },
     contentContainer:{
         flex: 1,
