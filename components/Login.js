@@ -54,13 +54,15 @@ export default class LoginScreen extends Component {
           ref="userName"
           style={styles.input}
           onChangeText={(userName) => this.setState({ userName: userName })}
-          placeholder="Username" />
+          placeholder="Username"
+          autoCapitalize='none'/>
         <TextInput
           ref="password"
           style={styles.input}
           onChangeText={((password) => this.setState({ password: password }))}
           secureTextEntry={true}
-          placeholder="Password" />
+          placeholder="Password"
+          autoCapitalize='none'/>
         <View style={{ marginTop: 20 }}>
           <Text style={{fontSize:20}}>Testing Credentials:</Text>
           <Text>User Name: testLM</Text>
