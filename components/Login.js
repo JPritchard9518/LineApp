@@ -34,6 +34,7 @@ export default class LoginScreen extends Component {
     return fetch(url).then((response) => response.json())
       .then((responseJson) => {
         if (responseJson.success) {
+          global.currentlyLoggedIn = responseJson.lm;
           this.props.navigation.navigate('DrawerStack')
         } else {
           this.setState({ errorMessage: responseJson.message })

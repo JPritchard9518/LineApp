@@ -30,7 +30,6 @@ export default class LineManagersList extends React.Component {
         var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=lineManagers';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
-                debugger;
                 this.setState({
                     loaded:true,
                     dataSource: this.state.dataSource.cloneWithRows(responseJson)
