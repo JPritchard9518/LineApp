@@ -30,11 +30,11 @@ export default class LoginScreen extends Component {
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
-    var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/validateLineManager?userName=' + userName + '&password=' + password;
+    var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/login?userName=' + userName + '&password=' + password;
     return fetch(url).then((response) => response.json())
       .then((responseJson) => {
         if (responseJson.success) {
-          global.currentlyLoggedIn = responseJson.lm;
+          global.currentlyLoggedIn = responseJson.loggedIn;
           this.props.navigation.navigate('DrawerStack')
         } else {
           this.setState({ errorMessage: responseJson.message })
@@ -50,7 +50,7 @@ export default class LoginScreen extends Component {
 
     return (
       <View style={styles.container}>
-        <Text style={styles.header}>Line Manager Login</Text>
+        <Text style={styles.header}>Login</Text>
         <TextInput
           ref="userName"
           style={styles.input}
@@ -66,7 +66,11 @@ export default class LoginScreen extends Component {
           autoCapitalize='none'/>
         <View style={{ marginTop: 20 }}>
           <Text style={{fontSize:20}}>Testing Credentials:</Text>
+          <Text style={{fontSize: 15}}>LM</Text>
           <Text>User Name: testLM</Text>
+          <Text>Password: password123</Text>
+          <Text style={{fontSize: 15}}>Admin</Text>
+          <Text>User Name: testAdmin</Text>
           <Text>Password: password123</Text>
         </View>
         <View style={styles.buttonContainer}>
