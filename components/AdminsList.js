@@ -5,7 +5,8 @@ import {
     View,
     Image,
     ListView,
-    ActivityIndicator
+    ActivityIndicator,
+    TouchableOpacity
 } from 'react-native';
 import moment from 'moment';
 import config from '../config.json';
@@ -27,6 +28,9 @@ export default class AdminsList extends React.Component {
 
         };
     }
+    returnData(lineObj) {
+        this.setState({ line: lineObj })
+    }
     componentDidMount(){
         var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=admins';
         return fetch(url).then((response) => response.json())
@@ -44,9 +48,15 @@ export default class AdminsList extends React.Component {
     renderRow(admin){
         return (
             <View style={Styles.adminContainer}>
-                <Text style={Styles.adminContainerText}>First Name: {admin.firstName}</Text>
-                <Text style={Styles.adminContainerText}>Last Name: {admin.lastName}</Text>
-                <Text style={Styles.adminContainerText}>Date Created: {moment(admin.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
+                {global.currentlyLoggedIn.type === 'admin' &&
+                    <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: admin, returnData: this.returnData.bind(this) })}>
+                        <Text style={Styles.adminContainerText}>First Name: {admin.firstName}</Text>
+                        <Text style={Styles.adminContainerText}>Last Name: {admin.lastName}</Text>
+                        <Text style={Styles.adminContainerText}>User Name: {admin.userName}</Text> 
+                        <Text style={Styles.adminContainerText}>Date Created: {moment(admin.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
+                    </TouchableOpacity>
+                }
+                
             </View>
         )
     }

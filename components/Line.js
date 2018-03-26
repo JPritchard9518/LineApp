@@ -163,9 +163,11 @@ export default class Line extends React.Component {
                             <Text style={Styles.accessButtonText}>Access Line</Text>
                         </TouchableOpacity>
                         <View style={{ borderLeftColor: '#FFF', borderLeftWidth: 1, marginTop: 0, marginLeft: 0 }} />
-                        <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: this.state.line, returnData: this.returnData.bind(this)})}>
-                            <Text style={Styles.accessButtonText}>Edit Line</Text>
-                        </TouchableOpacity>
+                        {global.currentlyLoggedIn.type === 'admin' && 
+                            <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: this.state.line, returnData: this.returnData.bind(this)})}>
+                                <Text style={Styles.accessButtonText}>Edit Line</Text>
+                            </TouchableOpacity>
+                        }
                     </View>
                 </View>
             </View>
@@ -222,7 +224,8 @@ const Styles = StyleSheet.create({
     accessButton:{
         backgroundColor: '#689F38',
         padding: 10,
-        width: '50%',
+        flex:1,
+        // maxWidth: '100%',
         height: 50,
         alignItems: 'center',
         alignSelf: 'center',

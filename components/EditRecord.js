@@ -18,6 +18,8 @@ export default class EditRecord extends React.Component {
         var title = 'Edit Record';
         if(typeof params.record.name !== 'undefined')
             title = 'Edit ' + params.record.name;
+        else if(typeof params.record.firstName !== 'undefined')
+            title = 'Edit ' + params.record.firstName + ' ' + params.record.lastName
         return {
             title: title,
             headerTitleStyle: {
@@ -51,6 +53,7 @@ export default class EditRecord extends React.Component {
                         this.setState({
                             record: responseJson.record
                         })
+                        this.props.navigation.goBack()
                     } else {
                         // Handle failed save here
                     }
@@ -65,13 +68,14 @@ export default class EditRecord extends React.Component {
         this.setState({record: updatedRecord})
     }
     renderTextInput(key,index){
+        if(key === 'password') return;
         var keyboardType = (['capacity','currentCapacity'].indexOf(key) > -1) ? "numeric" : "default";
         return(
             <View key={key} style={Styles.inputContainer}>
                 <Text>{key}</Text>
                 <TextInput
                     keyboardType={keyboardType}
-                    editable={!(key === '_id' || key === 'dateCreated')}
+                    editable={!(key === '_id' || key === 'dateCreated' || key === 'type')}
                     onChangeText={((newValue) => this.updateText(newValue,key))}
                     value={this.state.record[key].toString()}/>
             </View>

@@ -33,12 +33,26 @@ const LineStack = StackNavigator({
     headerMode: 'none',
     initialRouteName: 'Lines'
 })
+const AdminStack = StackNavigator({
+  "Admins": {screen: AdminsList},
+  "EditRecord": {screen: EditRecord}
+},{
+  headerMode: 'none',
+  initialRouteName: 'Admins'
+})
+const LineManagerStack = StackNavigator({
+  "LineManagers": { screen: LineManagersList },
+  "EditRecord": { screen: EditRecord }
+}, {
+    headerMode: 'none',
+    initialRouteName: 'LineManagers'
+  })
 // drawer menu routes
 const DrawerStack = DrawerNavigator({
   "Lines": { screen: LineStack },
-  "Admins": { screen: AdminsList },
+  "Admins": { screen: AdminStack },
   "Recipients": { screen: RecipientStack },
-  "Line Managers": { screen: LineManagersList },
+  "Line Managers": { screen: LineManagerStack },
   "Add New Recipient": { screen: NewRecipient },
 },
 {

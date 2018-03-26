@@ -65,12 +65,10 @@ export default class LoginScreen extends Component {
           placeholder="Password"
           autoCapitalize='none'/>
         <View style={{ marginTop: 20 }}>
-          <Text style={{fontSize:20}}>Testing Credentials:</Text>
-          <Text style={{fontSize: 15}}>LM</Text>
-          <Text>User Name: testLM</Text>
-          <Text>Password: password123</Text>
-          <Text style={{fontSize: 15}}>Admin</Text>
-          <Text>User Name: testAdmin</Text>
+          <Text style={{fontSize:20, paddingBottom: 20}}>Testing Credentials:</Text>
+          <Text>LM User Name: testLM</Text>
+          <Text style={{paddingBottom: 20}}>Password: password123</Text>
+          <Text>Admin User Name: testAdmin</Text>
           <Text>Password: password123</Text>
         </View>
         <View style={styles.buttonContainer}>

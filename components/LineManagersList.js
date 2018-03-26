@@ -5,7 +5,8 @@ import {
     View,
     Image,
     ListView,
-    ActivityIndicator
+    ActivityIndicator,
+    TouchableOpacity
 } from 'react-native';
 import moment from 'moment';
 import config from '../config.json';
@@ -26,6 +27,9 @@ export default class LineManagersList extends React.Component {
             loaded:false,
         };
     }
+    returnData(lineObj) {
+        this.setState({ line: lineObj })
+    }
     componentDidMount() {
         var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=lineManagers';
         return fetch(url).then((response) => response.json())
@@ -43,10 +47,14 @@ export default class LineManagersList extends React.Component {
     renderRow(lineManager) {
         return (
             <View style={Styles.lineManagerContainer}>
-                <Text style={Styles.lineManagerContainerText}>First Name: {lineManager.firstName}</Text>
-                <Text style={Styles.lineManagerContainerText}>Last Name: {lineManager.lastName}</Text>
-                <Text style={Styles.lineManagerContainerText}>User Name: {lineManager.userName}</Text> 
-                <Text style={Styles.lineManagerContainerText}>Date Created: {moment(lineManager.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
+                {global.currentlyLoggedIn.type === 'admin' &&
+                    <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: lineManager, returnData: this.returnData.bind(this) })}>
+                        <Text style={Styles.lineManagerContainerText}>First Name: {lineManager.firstName}</Text>
+                        <Text style={Styles.lineManagerContainerText}>Last Name: {lineManager.lastName}</Text>
+                        <Text style={Styles.lineManagerContainerText}>User Name: {lineManager.userName}</Text> 
+                        <Text style={Styles.lineManagerContainerText}>Date Created: {moment(lineManager.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
+                    </TouchableOpacity>
+                }
             </View>
         )
     }
