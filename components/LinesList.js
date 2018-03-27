@@ -27,7 +27,7 @@ export default class LinesList extends React.Component {
         };
     }
     componentDidMount() {
-        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=lines';
+        var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=lines';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
@@ -54,12 +54,16 @@ export default class LinesList extends React.Component {
     }
     render() {
         if(this.state.loaded){
-            return (
-                <ListView
-                    style={Styles.container}
-                    dataSource={this.state.dataSource}
-                    renderRow={(data) => this.renderRow(data)} />
-            )
+            if(this.state.dataSource.getRowCount() > 0){
+                return (
+                    <ListView
+                        style={Styles.container}
+                        dataSource={this.state.dataSource}
+                        renderRow={(data) => this.renderRow(data)} />
+                )
+            }else{
+                return(<Text style={{fontSize:18,padding:15}}>No Data To Show. Please Add a Line.</Text>)
+            }
         }else{
             return(
                 <View style={Styles.loadingContainer}>

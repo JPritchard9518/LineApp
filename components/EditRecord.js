@@ -43,7 +43,7 @@ export default class EditRecord extends React.Component {
     saveRecord(){
         Keyboard.dismiss()
         var data = JSON.stringify(this.state.record)
-        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/saveRecord?data=' + data;
+        var url = config.adminRouteProd + '/mobileAPI/saveRecord?data=' + data;
         return fetch(url, {
             method: "POST",
             }).then((response) => response.json())

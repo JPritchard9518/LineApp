@@ -32,15 +32,24 @@ export default class Recipient extends React.Component {
         };
     }
     componentDidMount() {
-        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveRecipientActions?recipientID=' + this.state.recipient._id;
+        debugger;
+        var url = config.adminRouteProd + '/mobileAPI/retrieveRecipientActions?recipientID=' + this.state.recipient._id;
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
-                // Add error checking
-                this.setState({
-                    loaded: true,
-                    dataSource: this.state.dataSource.cloneWithRows(responseJson.recipientActions.actions)
-                })
-
+                if(responseJson.success){
+                    console.log('Success true')
+                    this.setState({
+                        loaded: true,
+                        dataSource: this.state.dataSource.cloneWithRows(responseJson.recipientActions.actions),
+                        errorMessage: ''
+                    })
+                }else{
+                    console.log("Success false")
+                    this.setState({
+                        loaded:true,
+                        errorMessage: responseJson.message
+                    })
+                }
             })
             .catch((error) => {
                 this.setState({ errorMessage: error })
@@ -59,13 +68,15 @@ export default class Recipient extends React.Component {
 
     }
     renderRecipientActions(){
-        if(this.state.loaded){
+        if(this.state.loaded && this.state.errorMessage === ''){
             return (
                 <ListView
                     style={Styles.listContainer}
                     dataSource={this.state.dataSource}
                     renderRow={(data) => this.renderRow(data)} />
             )
+        }else if(this.state.errorMessage !== ''){
+            return(<Text style={{ color: '#000', fontSize: 20, padding: 20, alignSelf:'flex-start'}}>{this.state.errorMessage}</Text>)
         }else{
             return (
                 <View style={Styles.loadingContainer}>
@@ -85,7 +96,6 @@ export default class Recipient extends React.Component {
                     <Text style={Styles.recipientAttribute}>Family Members: {this.state.recipient.familyMembers.length}</Text>
                 </View>
                 {this.renderRecipientActions()}
-                <Text>{this.state.errorMessage}</Text>
             </View>
         )
     }
@@ -95,7 +105,7 @@ const Styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        justifyContent: 'space-between'
+        justifyContent: 'flex-start'
     },
     lineInfo: {
         justifyContent: 'space-between',

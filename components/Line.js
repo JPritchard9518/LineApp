@@ -33,7 +33,7 @@ export default class Line extends React.Component {
             faultType: '',
             remainingAttempts: 3, // For rescanning a fingerprint when credentials were not found.
             recipient: {},
-            currentRecipientID: "5a995fd737449d965cf8e98b" // Need to update this once finger is scanned
+            currentRecipientID: "5aba6683b3a25d0019f5cbc2" // Need to update this once finger is scanned
         };
         this.attemptLineAccess = this.attemptLineAccess.bind(this);
         this.renderAccessFault = this.renderAccessFault.bind(this);
@@ -46,7 +46,7 @@ export default class Line extends React.Component {
         if(this.state.remainingAttempts === 0){
             return this.setState({faultType: 'maxAttemptsReached', remainingAttempts: 3})
         }
-        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/attemptLineAccess?lineID=' + this.state.line._id + '&recipientID=' + this.state.currentRecipientID + '&accessFrequency=' + this.state.line.accessFrequency;
+        var url = config.adminRouteProd + '/mobileAPI/attemptLineAccess?lineID=' + this.state.line._id + '&recipientID=' + this.state.currentRecipientID + '&accessFrequency=' + this.state.line.accessFrequency;
         return fetch(url,{method:"POST"}).then((response) => response.json())
             .then((responseJson) => {
                 if(responseJson.success){

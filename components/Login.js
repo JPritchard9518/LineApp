@@ -30,13 +30,15 @@ export default class LoginScreen extends Component {
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
-    var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/login?userName=' + userName + '&password=' + password;
+    var url = config.adminRouteProd + '/mobileAPI/login?userName=' + userName + '&password=' + password;
+    // var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/login?userName=' + userName + '&password=' + password;
     return fetch(url).then((response) => response.json())
       .then((responseJson) => {
         if (responseJson.success) {
           global.currentlyLoggedIn = responseJson.loggedIn;
           this.props.navigation.navigate('DrawerStack')
         } else {
+          global.currentlyLoggedIn = {}
           this.setState({ errorMessage: responseJson.message })
         }
 

@@ -44,7 +44,7 @@ export default class NewRecipient extends React.Component {
     saveRecipient() {
         Keyboard.dismiss()
         var data = JSON.stringify(this.state.record)
-        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/saveRecipient?data=' + data;
+        var url = config.adminRouteProd + '/mobileAPI/saveRecipient?data=' + data;
         return fetch(url, {
             method: "POST",
         }).then((response) => response.json())

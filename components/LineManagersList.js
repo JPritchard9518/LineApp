@@ -31,7 +31,7 @@ export default class LineManagersList extends React.Component {
         this.setState({ line: lineObj })
     }
     componentDidMount() {
-        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=lineManagers';
+        var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=lineManagers';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({

@@ -27,7 +27,7 @@ export default class RecipientsList extends React.Component {
         };
     }
     componentDidMount() {
-        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=recipients';
+        var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=recipients';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({

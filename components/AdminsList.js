@@ -32,7 +32,7 @@ export default class AdminsList extends React.Component {
         this.setState({ line: lineObj })
     }
     componentDidMount(){
-        var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/retrieveList?type=admins';
+        var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=admins';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
