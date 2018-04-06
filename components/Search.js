@@ -28,11 +28,31 @@ export default class Search extends React.Component {
         super(props)
         this.state = {
             searchType: 'recipients',
+            recipientID: '5aba6683b3a25d0019f5cbc2',
+            errorMessage: ''
         }
-
     }
     findUserByFinger(){
         // Gather finger credentials and return recipient record
+        var url = config.adminRouteProd + '/mobileAPI/searchRecipient?&recipientID=' + this.state.recipientID;
+        return fetch(url, { method: "GET" }).then((response) => response.json())
+            .then((responseJson) => {
+                if (responseJson.success) {
+                    this.props.navigation.navigate('Recipient', { recipient: responseJson.recipient })
+                } else {
+                    var remainingAttempts = this.state.remainingAttempts;
+                    if (responseJson.type === 'credentialsNotFound')
+                        remainingAttempts--;
+                    this.setState({
+                        recipientResult: '',
+                        recipientID: '',
+                        errorMessage: responseJson.errorMessage
+                    })
+                }
+            })
+            .catch((error) => {
+                this.setState({ errorMessage: error })
+            });
         return;
     }
     render() {
@@ -43,6 +63,9 @@ export default class Search extends React.Component {
                     <TouchableOpacity style={Styles.scanButton} onPress={() => this.findUserByFinger()}>
                         <Text style={Styles.scanButtonText}>Scan Finger</Text>
                     </TouchableOpacity>
+                </View>
+                <View style={Styles.errorContainer}>
+                    <Text style={Styles.errorMessage}>{this.state.errorMessage}</Text>
                 </View>
                 {/* <Picker
                     style={{ width: '75%' }}
@@ -85,5 +108,12 @@ const Styles = StyleSheet.create({
         color: '#FFF',
         alignSelf: 'center'
     },
+    errorContainer:{
+        paddingTop: 30
+    },
+    errorMessage: {
+        color: 'red',
+        fontSize: 20
+    }
     
 })
