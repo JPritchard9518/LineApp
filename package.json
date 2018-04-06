@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
+    "justin": "cd /Users/justinpritchard/Library/Android/sdk/tools && emulator -avd Pixel_2_XL_API_23",
     "android": "react-native run-android",
     "postinstall": "rm ./node_modules/react-native/local-cli/core/__fixtures__/files/package.json"
   },

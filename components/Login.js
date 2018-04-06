@@ -30,6 +30,8 @@ export default class LoginScreen extends Component {
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
+    userName = 'testAdmin';
+    password = 'password123';
     var url = config.adminRouteProd + '/mobileAPI/login?userName=' + userName + '&password=' + password;
     // var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/login?userName=' + userName + '&password=' + password;
     return fetch(url).then((response) => response.json())

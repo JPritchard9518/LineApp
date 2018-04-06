@@ -36,10 +36,28 @@ export default class NewRecipient extends React.Component {
                 caseNumber: "",
                 housingLocation: "",
                 specialNeeds: "",
+                notes: "",
+                familyMembers: [],
             },
-            message: ''
+            customFields:[],
+            message: '',
+            familyMemberCount: 0,
         };
         this.saveRecipient = this.saveRecipient.bind(this);
+        this.addFamilyMember = this.addFamilyMember.bind(this);
+    }
+    componentDidMount() {
+        var url = config.adminRouteProd + '/mobileAPI/retrieveSettings?type=recipient';
+        return fetch(url).then((response) => response.json())
+            .then((responseJson) => {
+                this.setState({
+                    customFields: responseJson.settings.fields
+                })
+
+            })
+            .catch((error) => {
+                this.setState({ errorMessage: error })
+            });
     }
     saveRecipient() {
         Keyboard.dismiss()
@@ -64,23 +82,71 @@ export default class NewRecipient extends React.Component {
         updatedRecord[key] = newValue;
         this.setState({ record: updatedRecord })
     }
+    renderCustomFields(key,index){
+        return(
+            <View key={key} style={Styles.inputContainer}>
+                <Text>{key}</Text>
+                <TextInput
+                    onChangeText={((newValue) => this.updateText(newValue, key))}
+                    value={this.state.record[key]} />
+            </View>
+        )
+    }
+    renderFamilyInput(key,index){
+        var famNum = this.state.familyNumberCount;
+        var familyMembers = this.state.record.familyMembers;
+        var famObj = {
+            firstName: "",
+            lastName: "",
+            country: "",
+            languages: "",
+            dateOfBirth: "",
+            caseNumber: "",
+            housingLocation: "",
+            specialNeeds: "",
+            notes: "",
+        }
+        var newFamObj = {}
+        for(field in famObj){
+            var newField = (famNum - 1) + field
+            newFamObj[newField] = ""
+        }
+        familyMembers.push(famObj);
+        var record = this.state.record;
+        record.familyMembers = familyMembers;
+        this.setState({record:record},function(){
+            return(
+            <View>
+                {this.state.record.familyMembers.map((key, index)=> this.renderFam(key,index))}
+                <Text></Text>
+            </View>
+        )
+        })
+    }
+    // renderFam(key,index){
+    //     return({})
+    // }
+    addFamilyMember(){
+        var famCount = this.state.familyMemberCount + 1;
+        this.setState({familyMemberCount: famCount})
+    }
     render() {
         return (
             <View style={Styles.container}>
                 <Text style={Styles.header}>New Recipient</Text>
                 <ScrollView>
-                    <View style={Styles.inputContainer}>
+                    {/* <View style={Styles.inputContainer}>
                         <Text>First Name</Text>
                         <TextInput
                             onChangeText={((newValue) => this.updateText(newValue, "firstName"))}
                             value={this.state.record["firstName"]} />
-                    </View>
-                    <View style={Styles.inputContainer}>
+                    </View> */}
+                    {/* <View style={Styles.inputContainer}>
                         <Text>Last Name</Text>
                         <TextInput
                             onChangeText={((newValue) => this.updateText(newValue, "lastName"))}
                             value={this.state.record["lastName"]} />
-                    </View>
+                    </View> */}
                     <View style={Styles.inputContainer}>
                         <Text>Country</Text>
                         <TextInput
@@ -111,7 +177,25 @@ export default class NewRecipient extends React.Component {
                             onChangeText={((newValue) => this.updateText(newValue, "housingLocation"))}
                             value={this.state.record["housingLocation"]} />
                     </View>
+                    <View style={Styles.inputContainer}>
+                        <Text>Special Needs</Text>
+                        <TextInput
+                            onChangeText={((newValue) => this.updateText(newValue, "specialNeeds"))}
+                            value={this.state.record["specialNeeds"]} />
+                    </View>
+                    <View style={Styles.inputContainer}>
+                        <Text>Notes</Text>
+                        <TextInput
+                            multiline={true}
+                            onChangeText={((newValue) => this.updateText(newValue, "notes"))}
+                            value={this.state.record["notes"]} />
+                    </View>
+                    {this.state.customFields.map((key,index) => this.renderCustomFields(key,index))}
+                    {() => this.renderFamilyInput()}
                 </ScrollView>
+                <TouchableOpacity style={Styles.saveButton} onPress={() => this.addFamilyMember()}>
+                    <Text style={Styles.saveButtonText}>Add Family Member</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={Styles.saveButton}>
                     <Text style={Styles.saveButtonText}>Scan Finger</Text>
                 </TouchableOpacity>
@@ -148,8 +232,8 @@ const Styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
         alignSelf: 'center',
-        marginTop: 25,
-        marginBottom: 25
+        marginTop: 10,
+        // marginBottom: 10
     },
     saveButtonText: {
         color: '#FFF'

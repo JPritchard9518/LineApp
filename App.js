@@ -10,6 +10,7 @@ import LineManagersList from './components/LineManagersList.js'
 import LinesList from './components/LinesList.js'
 import Line from './components/Line.js'
 import EditRecord from './components/EditRecord.js'
+import Search from './components/Search.js'
 import Icon from 'react-native-vector-icons/FontAwesome'; // https://github.com/oblador/react-native-vector-icons
 
 import SideMenu from './components/SideMenu.js'
@@ -54,6 +55,7 @@ const DrawerStack = DrawerNavigator({
   "Recipients": { screen: RecipientStack },
   "Line Managers": { screen: LineManagerStack },
   "Add New Recipient": { screen: NewRecipient },
+  "Search": { screen: Search },
 },
 {
   contentComponent: ({navigation}) => (
