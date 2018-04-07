@@ -10,9 +10,12 @@
     "postinstall": "rm ./node_modules/react-native/local-cli/core/__fixtures__/files/package.json"
   },
   "dependencies": {
+    "country-data": "0.0.31",
     "moment": "^2.21.0",
     "react": "16.2.0",
     "react-native": "0.53.3",
+    "react-native-country-picker-modal": "^0.5.1",
+    "react-native-datepicker": "^1.6.0",
     "react-native-menu": "^0.23.0",
     "react-native-popup-menu": "^0.12.3",
     "react-native-vector-icons": "^4.5.0",
