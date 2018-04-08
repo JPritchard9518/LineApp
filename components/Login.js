@@ -5,7 +5,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Keyboard
+  Keyboard,
+  NetInfo
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import config from '../config.json';
@@ -23,8 +24,24 @@ export default class LoginScreen extends Component {
       userName: '',
       password: '',
       errorMessage: '',
+      connected: ''
     }
     this.login = this.login.bind(this);
+  }
+  componentDidMount() {
+    NetInfo.isConnected.fetch().then((isConnected) => {
+      global.connected = isConnected;
+      this.setState({ connected: isConnected })
+    });
+    NetInfo.isConnected.addEventListener('connectionChange', this._handleConnectionChange);
+  }
+  componentWillUnmount() {
+    NetInfo.isConnected.removeEventListener('connectionChange', this._handleConnectionChange);
+  }
+  // Connection Type: none, wifi, cellular, unknown
+  _handleConnectionChange = (isConnected) => {
+    global.connected = isConnected;
+    this.setState({connected:isConnected})
   }
   login() {
     Keyboard.dismiss()
@@ -33,7 +50,6 @@ export default class LoginScreen extends Component {
     // userName = 'testAdmin';
     // password = 'password123';
     var url = config.adminRouteProd + '/mobileAPI/login?userName=' + userName + '&password=' + password;
-    // var url = 'http://' + config.ip + ':' + config.port + '/mobileAPI/login?userName=' + userName + '&password=' + password;
     return fetch(url).then((response) => response.json())
       .then((responseJson) => {
         if (responseJson.success) {
@@ -43,7 +59,6 @@ export default class LoginScreen extends Component {
           global.currentlyLoggedIn = {}
           this.setState({ errorMessage: responseJson.message })
         }
-
       })
       .catch((error) => {
         this.setState({ errorMessage: error })
@@ -54,6 +69,7 @@ export default class LoginScreen extends Component {
 
     return (
       <View style={styles.container}>
+        <Text style={{ color: (global.connected) ? '#689F38' : '#BE2E37'}}>{(global.connected) ? "Connected":"Not Connected"}</Text>
         <Text style={styles.header}>Login</Text>
         <TextInput
           ref="userName"
