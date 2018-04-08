@@ -48,6 +48,13 @@ const LineManagerStack = StackNavigator({
     headerMode: 'none',
     initialRouteName: 'LineManagers'
   })
+const SearchStack = StackNavigator({
+  "Search": {screen: Search},
+  "Recipient": {screen: Recipient}
+},{
+  headerMode: 'none',
+  initialRouteName: 'Search'
+})
 // drawer menu routes
 const DrawerStack = DrawerNavigator({
   "Lines": { screen: LineStack },
