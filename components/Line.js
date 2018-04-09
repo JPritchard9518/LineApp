@@ -6,7 +6,8 @@ import {
     Image,
     ListView,
     TouchableOpacity,
-    ScrollView
+    ScrollView,
+    AsyncStorage
 } from 'react-native';
 import config from '../config.json';
 import moment from 'moment';
@@ -33,23 +34,164 @@ export default class Line extends React.Component {
             faultType: '',
             remainingAttempts: 3, // For rescanning a fingerprint when credentials were not found.
             recipient: {},
+            offlineRecipientsArr: [],
+            offlineRecipientActionsArr: [],
+            offlineActionsQueueArr: [],
             currentRecipientID: "5aba6683b3a25d0019f5cbc2" // Need to update this once finger is scanned
         };
         this.attemptLineAccess = this.attemptLineAccess.bind(this);
         this.renderAccessFault = this.renderAccessFault.bind(this);
         this.renderAccessSuccess = this.renderAccessSuccess.bind(this);
     }
+    componentDidMount(){
+        if(!!global.networkConnected){
+            this.setOfflineRecip();
+            this.setOfflineActions();
+            this.setOfflineActionsQueue();
+        }
+    }
+    async setOfflineRecip(){
+        try {
+            const recipients = await AsyncStorage.getItem('recipients');
+            if(recipients === null) recipients = [];
+            this.setState({offlineRecipientsArr: JSON.parse(recipients)})
+        } catch (error) {
+            this.setState({ offlineRecipientsArr: []})
+            // this.setState({errorMessage: error})
+        }
+    }
+    async setOfflineActions() {
+        try {
+            const actions = await AsyncStorage.getItem('recipientActions');
+            if(actions === null) actions = [];
+            this.setState({ offlineRecipientActionsArr: JSON.parse(actions) })
+        } catch (error) {
+            this.setState({ offlineRecipientActionsArr: [] })
+            // this.setState({ errorMessage: error })
+        }
+    }
+    async setOfflineActionsQueue(){
+        try {
+            const actionsQueue = await AsyncStorage.getItem('actionQueue');
+            if(actionsQueue === null) actionsQueue = [];
+            this.setState({offlineActionsQueueArr: JSON.parse(actionsQueue)})
+        } catch (error) {
+            this.setState({ offlineActionsQueueArr: [] })
+        }
+    }
     returnData(lineObj){
         this.setState({line: lineObj})
     }
     attemptLineAccess(){
+        // Scan finger here
+        if(global.networkConnected)
+            return this.onlineAccessMethod();
+        else
+            return this.offlineAccessMethod();
+    }
+    offlineAccessMethod(){
         if(this.state.remainingAttempts === 0){
             return this.setState({faultType: 'maxAttemptsReached', remainingAttempts: 3})
         }
+            
+        var scannedID = this.state.currentRecipientID;
+        var recipientsArr = this.state.offlineRecipientsArr;
+        var recipientFound = false;
+        var recipient;
+        
+        // Search through offline recipients to find matching fingerprint credential
+        for(var i = 0; i < recipientsArr.length; i++){
+            if(scannedID === recipientsArr[i]._id){
+                recipientFound = true;// Check for matching finger credentials
+                recipient = recipientsArr[i];
+                break;
+            }
+        }
+        if(!recipientFound){ // If credentials not found, give another attempt until 3 failures
+            var remainingAttempts = this.state.remainingAttempts;
+            // Update the other states once we have sensor working
+            this.setState({
+                remainingAttempts: --remainingAttempts,
+            })
+        }else{
+            var actions = this.state.offlineRecipientActionsArr;
+            var matchingActionObj;
+            var matchingActionObjFound = false;
+            // Search through offline recipient actions to find existing access history
+            for(var i = 0; i < actions.length; i++){
+                if(actions[i].recipientID === recipient._id){
+                    matchingActionObj = actions[i];
+                    matchingActionObjFound = true;
+                    break;
+                }
+            }
+            
+            var offlineActionsQueue = this.state.offlineActionsQueueArr;
+            if(typeof matchingActionObj === 'undefined'){
+                matchingActionObj = {
+                    recipientID: recipient._id,
+                    actions: []
+                }
+            }
+            // Search through offline actions queue for recent repeat offenders
+            for (var i = 0; i < offlineActionsQueue.length; i++) {
+                if(offlineActionsQueue[i].recipientID === recipient._id){
+                    matchingActionObjFound = true;
+                    matchingActionObj.actions.push(offlineActionsQueue[i])
+                }
+            }
+            var accessFault = false;
+            var line = this.state.line;
+            var accessFrequency = this.state.line.accessFrequency;
+            var accessLowerBound = moment().subtract(accessFrequency, 'hours').toDate();
+            if(matchingActionObjFound){
+                var fault = {};
+                for(var i = 0; i < matchingActionObj.actions.length; i++){
+                    var actionLine = matchingActionObj.actions[i].lineID;
+                    var date = moment(matchingActionObj.actions[i].date);
+                    if(line._id === actionLine){
+                        if(date.isAfter(accessLowerBound)){
+                            accessFault = true;
+                            fault = matchingActionObj.actions[i];
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            if(accessFault){
+                this.setState({
+                    accessFault: true,
+                    accessSuccess:false,
+                    currentFault: fault || {},
+                    currentSuccess: {},
+                    faultType: 'faultyAccess',
+                    recipient: recipient
+                })
+            }else{
+                // Success
+                var setObj = {
+                    line: line,
+                    accessfault: false,
+                    accessSuccess: true,
+                    currentFault: {},
+                    faultType: '',
+                    remainingAttempts: 3,
+                    recipient: recipient,
+                }
+                this.logOfflineSuccess(line,recipient, setObj);
+            }
+        }
+        
+    }
+    onlineAccessMethod(){
+        if (this.state.remainingAttempts === 0) {
+            return this.setState({ faultType: 'maxAttemptsReached', remainingAttempts: 3 })
+        }
         var url = config.adminRouteProd + '/mobileAPI/attemptLineAccess?lineID=' + this.state.line._id + '&recipientID=' + this.state.currentRecipientID + '&accessFrequency=' + this.state.line.accessFrequency;
-        return fetch(url,{method:"POST"}).then((response) => response.json())
+        return fetch(url, { method: "POST" }).then((response) => response.json())
             .then((responseJson) => {
-                if(responseJson.success){
+                if (responseJson.success) {
                     const { setParams } = this.props.navigation;
                     this.setState({
                         line: responseJson.line,
@@ -61,12 +203,12 @@ export default class Line extends React.Component {
                         remainingAttempts: 3,
                         recipient: responseJson.recipient
                     })
-                }else{
+                } else {
                     var remainingAttempts = this.state.remainingAttempts;
-                    if(responseJson.type === 'credentialsNotFound')
+                    if (responseJson.type === 'credentialsNotFound')
                         remainingAttempts--;
                     this.setState({
-                        accessFault:true,
+                        accessFault: true,
                         accessSuccess: false,
                         currentFault: responseJson.accessFault || {},
                         currentSuccess: {},
@@ -79,6 +221,35 @@ export default class Line extends React.Component {
             .catch((error) => {
                 this.setState({ errorMessage: error })
             });
+    }
+    logOfflineSuccess(line,recipient,setObj){
+        var offActQueue = this.state.offlineActionsQueueArr;
+        var actionDate = moment().toDate();
+        var actionObj = {
+            recipientID: recipient._id,
+            lineID: line._id,
+            lineName: line.name,
+            date: actionDate,
+            resource: line.resource,
+            numTaken: 1 // Add family member access here
+            // Add more items to track here for each transaction
+        }
+        offActQueue.push(actionObj);
+        setObj.offlineActionsQueueArr = offActQueue;
+        setObj.currentSuccess = actionObj;
+        this.addToActionQueue(actionObj).then(() => this.setState(setObj))
+    }
+    async addToActionQueue(actionObj) {
+        try {
+            const actionQueue = await AsyncStorage.getItem('actionQueue');
+            var actionQueue = JSON.parse(actionQueue);
+            actionQueue.push(actionObj)
+            await AsyncStorage.setItem('actionQueue',JSON.stringify(actionQueue))
+        } catch (error) {
+            var actionQueue = [];
+            actionQueue.push(actionObj)
+            await AsyncStorage.setItem('actionQueue', JSON.stringify(actionQueue))
+        }
     }
     renderAccessFault(){
         if(this.state.accessFault === false)
@@ -143,6 +314,7 @@ export default class Line extends React.Component {
     render() {
         return (
             <View style={Styles.container}>
+                {/* <Text>{this.state.offlineRecipientActionsArr.length} {this.state.offlineRecipientsArr.length} {this.state.offlineActionsQueueArr.length}</Text> */}
                 <View style={Styles.contentContainer}>
                     <Text style={[Styles.lineAttribute, Styles.headerText, {marginLeft:20}]}>Name: {this.state.line.name}</Text>
                     <ScrollView>
@@ -152,7 +324,7 @@ export default class Line extends React.Component {
                             <Text style={Styles.lineAttribute}>Open - Close: {this.state.line.openCloseTime}</Text>
                             <Text style={Styles.lineAttribute}>Access Frequency: {this.state.line.accessFrequency} hrs</Text>
                         </View>
-                        {/* <Text>{this.state.errorMessage}</Text> */}
+                        <Text>{this.state.errorMessage}</Text>
                     
                         {this.renderAccessFault()}
                         {this.renderAccessSuccess()}

@@ -13,7 +13,7 @@ export default class SideMenu extends React.Component {
         this.state = {
             connected: false,
             downloadStatus: 0,
-            downloadProgress: '',
+            message: '',
             recipientActions: null,
             numDownloaded:0,
         }
@@ -21,7 +21,8 @@ export default class SideMenu extends React.Component {
     }
     componentDidMount() {
         NetInfo.isConnected.fetch().then((isConnected) => {
-            global.connected = isConnected;
+            global.networkConnected = isConnected;
+            this.uploadQueue()
             this.setState({ connected: isConnected })
         });
         NetInfo.isConnected.addEventListener('connectionChange', this._handleConnectionChange);
@@ -29,10 +30,35 @@ export default class SideMenu extends React.Component {
     componentWillUnmount() {
         NetInfo.isConnected.removeEventListener('connectionChange', this._handleConnectionChange);
     }
-    // Connection Type: none, wifi, cellular, unknown
     _handleConnectionChange = (isConnected) => {
-        global.connected = isConnected;
-        this.setState({ connected: isConnected })
+        global.networkConnected = isConnected;
+        if (global.networkConnected) {
+            this.uploadQueue();
+        }
+        this.setState({ connected: isConnected})
+    }
+    async uploadQueue() {
+        try {
+            const value = await AsyncStorage.getItem('actionQueue');
+            var url = config.adminRouteProd + '/mobileAPI/uploadQueue?queue=' + value
+            return fetch(url,{method:'POST'})
+                .then((response) => response.json())
+                .then((responseJson) => {
+                    if(responseJson.success){
+                        this.clearQueue()
+                    }
+                }).done()
+        } catch (error) {
+            this.setState({message: 'Error uploading queue'});
+        }
+    }
+    async clearQueue() {
+        try {
+            await AsyncStorage.removeItem('actionQueue')
+            this.setState({message: 'Queue successfully cleared', uploadingQueue: false})
+        } catch (error) {
+            this.setState({mesage: 'Error clearing queue'})
+        }
     }
     navigateToScreen = (route) => () => {
         if(route === 'loginStack') global.currentlyLoggedIn = {};
@@ -42,18 +68,15 @@ export default class SideMenu extends React.Component {
         this.props.navigation.dispatch(navigateAction);
     }
     queryCollections(index){
-        if(!global.connected)
+        if(!global.networkConnected)
             return this.setState({message: "Please Connect to the Network"})
         else if(typeof collectionsToDownload[index] === 'undefined'){
             this.setState({downloadStatus: 2, message: 'Import Complete!', numDownloaded: 0})
         }else{
             this.setState({ downloadStatus: 1, numDownloaded: index, message: (collectionsToDownload.length - index) + '/' + collectionsToDownload.length + ' collections left to import'},function(){
-                this.gatherResource(collectionsToDownload[index],index).then((val) => {
-                })
+                this.gatherResource(collectionsToDownload[index],index).done()
             })
         }
-        
-        
     }
     gatherResource = async (collection,index) => {
         var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=' + collection + '&limit=10000';
@@ -80,9 +103,9 @@ export default class SideMenu extends React.Component {
         }
     }
     renderDownloadProgress(){
-        if(this.state.downloadStatus || this.state.message === 'Import Complete!'){
+        if(this.state.downloadStatus){
             var progressPerc = (this.state.numDownloaded/collectionsToDownload.length) * 100;
-            if(this.state.message === 'Import Complete!')
+            if(this.state.downloadStatus > 1)
                 progressPerc = 100;
             return(
                 <View>
@@ -91,7 +114,7 @@ export default class SideMenu extends React.Component {
                         <View style={{backgroundColor: '#689F38', height: '100%', width: progressPerc + '%'}}/>
                         <View style={{backgroundColor: '#FFF', height: '100%', width: (1-progressPerc) + '%'}}/>
                     </View>
-                    {this.state.message === 'Import Complete!' && <Text style={Styles.navItem}>Collections Last Imported: {moment().format("MM/DD/YYYY hh:mm:ss A")}</Text>}
+                    {this.state.downloadStatus > 1 && <Text style={Styles.navItem}>Collections Last Imported: {moment().format("MM/DD/YYYY hh:mm:ss A")}</Text>}
                 </View>
             )
         }
@@ -139,7 +162,7 @@ export default class SideMenu extends React.Component {
                     <View style={Styles.navItemContainer}>
                         <Text style={[Styles.navItem,Styles.logout]} onPress={this.navigateToScreen('loginStack')}>Logout</Text>
                     </View>
-                    <Text style={{ padding: 10 }}>Network Status: <Text style={{ color: (global.connected) ? "#689F38" : "#BE2E37" }}>{(global.connected) ? "Connected" : "Not Connected"}</Text></Text>
+                    <Text style={{ padding: 10 }}>Network Status: <Text style={{ color: (global.networkConnected) ? "#689F38" : "#BE2E37" }}>{(global.networkConnected) ? "Connected" : "Not Connected"}</Text></Text>
                         
                 </View>
             </View>
