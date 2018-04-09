@@ -6,7 +6,8 @@ import {
   TextInput,
   TouchableOpacity,
   Keyboard,
-  NetInfo
+  NetInfo,
+  AsyncStorage
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import config from '../config.json';
@@ -29,8 +30,9 @@ export default class LoginScreen extends Component {
     this.login = this.login.bind(this);
   }
   componentDidMount() {
+    AsyncStorage.clear()
     NetInfo.isConnected.fetch().then((isConnected) => {
-      global.connected = isConnected;
+      global.networkConnected = isConnected;
       this.setState({ connected: isConnected })
     });
     NetInfo.isConnected.addEventListener('connectionChange', this._handleConnectionChange);
@@ -40,21 +42,21 @@ export default class LoginScreen extends Component {
   }
   // Connection Type: none, wifi, cellular, unknown
   _handleConnectionChange = (isConnected) => {
-    global.connected = isConnected;
+    global.networkConnected = isConnected;
     this.setState({connected:isConnected})
   }
   login() {
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
-    // userName = 'testAdmin';
-    // password = 'password123';
+    userName = 'testAdmin';
+    password = 'password123';
     var url = config.adminRouteProd + '/mobileAPI/login?userName=' + userName + '&password=' + password;
     return fetch(url).then((response) => response.json())
       .then((responseJson) => {
         if (responseJson.success) {
           global.currentlyLoggedIn = responseJson.loggedIn;
-          this.props.navigation.navigate('DrawerStack')
+          this.props.navigation.navigate('drawerStack')
         } else {
           global.currentlyLoggedIn = {}
           this.setState({ errorMessage: responseJson.message })
@@ -69,7 +71,7 @@ export default class LoginScreen extends Component {
 
     return (
       <View style={styles.container}>
-        <Text style={{ color: (global.connected) ? '#689F38' : '#BE2E37'}}>{(global.connected) ? "Connected":"Not Connected"}</Text>
+        <Text style={{ color: (global.networkConnected) ? '#689F38' : '#BE2E37'}}>{(global.networkConnected) ? "Connected":"Not Connected"}</Text>
         <Text style={styles.header}>Login</Text>
         <TextInput
           ref="userName"
