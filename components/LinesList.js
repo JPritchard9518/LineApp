@@ -45,10 +45,10 @@ export default class LinesList extends React.Component {
             <TouchableOpacity onPress={() => this.props.navigation.navigate('Line',{line:line})} style={Styles.lineContainer}>
                 <Text style={[Styles.lineContainerText,{fontSize: 25}]}>Line Name: {line.name}</Text>
                 <Text style={Styles.lineContainerText}>Resource: {line.resource}</Text>
-                <Text style={Styles.lineContainerText}>Capacity: {line.currentCapacity}/{line.capacity}</Text>
+                {/* <Text style={Styles.lineContainerText}>Capacity: {line.currentCapacity}/{line.capacity}</Text> */}
                 <Text style={Styles.lineContainerText}>Open - Close: {line.openCloseTime}</Text>
                 <Text style={Styles.lineContainerText}>Date Created: {moment(line.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
-                <Text style={Styles.lineContainerText}>Access Frequency: {line.accessFrequency} hrs</Text>
+                {/* <Text style={Styles.lineContainerText}>Access Frequency: {line.accessFrequency} hrs</Text> */}
             </TouchableOpacity>
         )
     }
@@ -87,7 +87,6 @@ const Styles = StyleSheet.create({
         padding: 30,
         backgroundColor: '#FFF',
         borderColor: '#000',
-        marginBottom: 10,
         margin: 10,
         borderRadius: 3,
         elevation: 3,

@@ -55,7 +55,7 @@ export default class SideMenu extends React.Component {
     async clearQueue() {
         try {
             await AsyncStorage.removeItem('actionQueue')
-            this.setState({message: 'Queue successfully cleared', uploadingQueue: false})
+            this.setState({ message: 'Queue successfully cleared at ' + moment().format("MM/DD/YYYY hh:mm:ss A"), uploadingQueue: false})
         } catch (error) {
             this.setState({mesage: 'Error clearing queue'})
         }

@@ -7,10 +7,15 @@ import {
     ListView,
     TouchableOpacity,
     ScrollView,
-    AsyncStorage
+    AsyncStorage,
+    Animated,
+    Easing,
+    Dimensions
 } from 'react-native';
 import config from '../config.json';
 import moment from 'moment';
+
+import Fingerprint from '../NativeModules/Fingerprint';
 
 export default class Line extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -27,11 +32,10 @@ export default class Line extends React.Component {
         this.state = {
             line: this.props.navigation.state.params.line,
             errorMessage:'',
-            accessFault: false,
-            accessSuccess: false,
-            currentFault: {},
-            currentSuccess: {},
-            faultType: '',
+            lastAccess: false,
+            fadeAnim: new Animated.Value(0),
+            swipeAnim: new Animated.Value(0),
+            type: '',
             remainingAttempts: 3, // For rescanning a fingerprint when credentials were not found.
             recipient: {},
             offlineRecipientsArr: [],
@@ -40,15 +44,17 @@ export default class Line extends React.Component {
             currentRecipientID: "5aba6683b3a25d0019f5cbc2" // Need to update this once finger is scanned
         };
         this.attemptLineAccess = this.attemptLineAccess.bind(this);
-        this.renderAccessFault = this.renderAccessFault.bind(this);
-        this.renderAccessSuccess = this.renderAccessSuccess.bind(this);
+        this.renderTimeSince = this.renderTimeSince.bind(this);
+        // this.approveOrDeny = this.approveOrDeny.bind(this);
     }
     componentDidMount(){
-        if(!!global.networkConnected){
+        Fingerprint.getReaders((msg) => { this.setState({errorMessage:msg})})
+        if (!global.networkConnected) {
             this.setOfflineRecip();
             this.setOfflineActions();
             this.setOfflineActionsQueue();
         }
+        
     }
     async setOfflineRecip(){
         try {
@@ -91,9 +97,11 @@ export default class Line extends React.Component {
     }
     offlineAccessMethod(){
         if(this.state.remainingAttempts === 0){
-            return this.setState({faultType: 'maxAttemptsReached', remainingAttempts: 3})
+            return this.setState({type: 'maxAttemptsReached', remainingAttempts: 3},function(){
+                Animated.timing(this.state.swipeAnim, { toValue: 0, duration: 1 }).start()
+                Animated.timing(this.state.fadeAnim, { toValue: 1, duration: 200 }).start()
+            })
         }
-            
         var scannedID = this.state.currentRecipientID;
         var recipientsArr = this.state.offlineRecipientsArr;
         var recipientFound = false;
@@ -101,6 +109,7 @@ export default class Line extends React.Component {
         
         // Search through offline recipients to find matching fingerprint credential
         for(var i = 0; i < recipientsArr.length; i++){
+            console.log('scanned: ' + scannedID + ' recip: ' + recipientsArr[i]._id)
             if(scannedID === recipientsArr[i]._id){
                 recipientFound = true;// Check for matching finger credentials
                 recipient = recipientsArr[i];
@@ -110,6 +119,7 @@ export default class Line extends React.Component {
         if(!recipientFound){ // If credentials not found, give another attempt until 3 failures
             var remainingAttempts = this.state.remainingAttempts;
             // Update the other states once we have sensor working
+            // return ?
             this.setState({
                 remainingAttempts: --remainingAttempts,
             })
@@ -142,79 +152,88 @@ export default class Line extends React.Component {
             }
             var accessFault = false;
             var line = this.state.line;
-            var accessFrequency = this.state.line.accessFrequency;
-            var accessLowerBound = moment().subtract(accessFrequency, 'hours').toDate();
+            // var accessFrequency = this.state.line.accessFrequency;
+            // var accessLowerBound = moment().subtract(accessFrequency, 'hours').toDate();
+            var lastAccessDate;
+            var firstAccess = false;
             if(matchingActionObjFound){
                 var fault = {};
                 for(var i = 0; i < matchingActionObj.actions.length; i++){
                     var actionLine = matchingActionObj.actions[i].lineID;
                     var date = moment(matchingActionObj.actions[i].date);
                     if(line._id === actionLine){
-                        if(date.isAfter(accessLowerBound)){
-                            accessFault = true;
-                            fault = matchingActionObj.actions[i];
-                            break;
-                        }
+                        if(typeof lastAccessDate === 'undefined')
+                            lastAccessDate = moment(matchingActionObj.actions[i].date).toDate()
+                        if(date.isAfter(lastAccessDate))
+                            lastAccessDate = moment(date).toDate()
                     }
+                }
+                if(typeof lastAccessDate === 'undefined'){
+                    firstAccess = true;
+                    lastAccessDate = false;
                 }
             }
             
-            if(accessFault){
+            if(!matchingActionObjFound && !firstAccess){
+                console.log('NNOOOOO')
                 this.setState({
                     accessFault: true,
                     accessSuccess:false,
-                    currentFault: fault || {},
-                    currentSuccess: {},
-                    faultType: 'faultyAccess',
-                    recipient: recipient
+                    type: 'faultyAccess',
+                    recipient: recipient,
+                },function(){
+                    Animated.timing(this.state.swipeAnim, { toValue: 0, duration: 1 }).start()
+                    Animated.timing(this.state.fadeAnim, { toValue: 1, duration: 200 }).start()
                 })
             }else{
                 // Success
-                var setObj = {
-                    line: line,
-                    accessfault: false,
-                    accessSuccess: true,
-                    currentFault: {},
-                    faultType: '',
+                console.log(lastAccessDate);
+                this.setState({
+                    type: (firstAccess) ? 'firstAccess':'',
                     remainingAttempts: 3,
                     recipient: recipient,
-                }
-                this.logOfflineSuccess(line,recipient, setObj);
+                    lastAccess:lastAccessDate,
+                },function(){
+                    Animated.timing(this.state.swipeAnim, { toValue: 0, duration: 1 }).start()
+                    Animated.timing(this.state.fadeAnim, { toValue: 1, duration: 200 }).start()
+                })
+                // this.logOfflineApproval(line,recipient, setObj);
             }
         }
         
     }
     onlineAccessMethod(){
         if (this.state.remainingAttempts === 0) {
-            return this.setState({ faultType: 'maxAttemptsReached', remainingAttempts: 3 })
+            Animated.timing(this.state.swipeAnim, { toValue: 0, duration: 1 }).start()
+            Animated.timing(this.state.fadeAnim, { toValue: 1, duration: 200 }).start()
+            return this.setState({ type: 'maxAttemptsReached', remainingAttempts: 3, lastAccess:null})
         }
-        var url = config.adminRouteProd + '/mobileAPI/attemptLineAccess?lineID=' + this.state.line._id + '&recipientID=' + this.state.currentRecipientID + '&accessFrequency=' + this.state.line.accessFrequency;
-        return fetch(url, { method: "POST" }).then((response) => response.json())
+        var url = config.adminRouteProd + '/mobileAPI/validateAndRetrieveLastAction?lineID=' + this.state.line._id + '&recipientID=' + this.state.currentRecipientID;
+        return fetch(url, { method: "GET" }).then((response) => response.json())
             .then((responseJson) => {
                 if (responseJson.success) {
                     const { setParams } = this.props.navigation;
                     this.setState({
-                        line: responseJson.line,
-                        accessFault: false,
-                        accessSuccess: true,
-                        currentSuccess: responseJson.accessSuccess,
-                        currentFault: {},
-                        faultType: '',
+                        lastAccess: responseJson.lastAccess,
                         remainingAttempts: 3,
+                        type: responseJson.type,
                         recipient: responseJson.recipient
+                    },function(){
+                        Animated.timing(this.state.swipeAnim, { toValue: 0, duration: 1 }).start()
+                        Animated.timing(this.state.fadeAnim, { toValue: 1, duration: 200 }).start()
                     })
                 } else {
                     var remainingAttempts = this.state.remainingAttempts;
                     if (responseJson.type === 'credentialsNotFound')
                         remainingAttempts--;
                     this.setState({
-                        accessFault: true,
-                        accessSuccess: false,
-                        currentFault: responseJson.accessFault || {},
-                        currentSuccess: {},
-                        faultType: responseJson.type,
+                        lastAccess:null,
+                        type: responseJson.type,
                         remainingAttempts: remainingAttempts,
                         recipient: responseJson.recipient,
+                    },function(){
+                        Animated.timing(this.state.swipeAnim, { toValue: 0, duration: 1 }).start()
+                        Animated.timing(this.state.fadeAnim, { toValue: 1, duration: 200 }).start()
                     })
                 }
             })
@@ -222,7 +241,7 @@ export default class Line extends React.Component {
                 this.setState({ errorMessage: error })
             });
     }
-    logOfflineSuccess(line,recipient,setObj){
+    logOfflineApproval(line,recipient,setObj){
         var offActQueue = this.state.offlineActionsQueueArr;
         var actionDate = moment().toDate();
         var actionObj = {
@@ -236,8 +255,8 @@ export default class Line extends React.Component {
         }
         offActQueue.push(actionObj);
         setObj.offlineActionsQueueArr = offActQueue;
-        setObj.currentSuccess = actionObj;
         this.addToActionQueue(actionObj).then(() => this.setState(setObj))
+
     }
     async addToActionQueue(actionObj) {
         try {
@@ -251,97 +270,129 @@ export default class Line extends React.Component {
             await AsyncStorage.setItem('actionQueue', JSON.stringify(actionQueue))
         }
     }
-    renderAccessFault(){
-        if(this.state.accessFault === false)
-            return
-        if(this.state.faultType === 'faultyAccess'){
-            var faultDate = moment(this.state.currentFault.date);
-            var now = moment();
-            var validAccessDate = moment(faultDate).add(this.state.line.accessFrequency,'hours');
-            var timeDiff = validAccessDate.diff(now,'milliseconds');
-            var seconds = Math.floor((timeDiff / 1000) % 60);
-            var minutes = Math.floor((timeDiff / (1000 * 60)) % 60);
-            var hours = Math.floor(((timeDiff / (1000 * 60 * 60)) % 24));
-            var timeString = hours.toFixed(0) + ' hours, ' +  minutes.toFixed(0) +  ' minutes, ' + seconds.toFixed(0) + ' seconds';
-            return(
-                <View style={Styles.faultContainer}>
-                    <Text style={[Styles.attribute,{fontSize: 25}]}>Access Fault</Text>
-                    <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient', { recipient: this.state.recipient })}>
-                        <Text style={Styles.attribute}>Name: {this.state.recipient.firstName} {this.state.recipient.lastName}</Text>
-                        <Text style={Styles.attribute}>Language(s): {this.state.recipient.languages}</Text>
-                    </TouchableOpacity>
-                    <View style={{ borderBottomColor: '#FFF', borderBottomWidth: 1, marginTop: 20, marginBottom: 20 }} />
-                    <Text style={Styles.attribute}>Last Line Access: {moment(this.state.currentFault.date).format("MM/DD/YYYY hh:mm:ss A")}</Text>
-                    <Text style={Styles.attribute}>Next Valid Access: {moment(validAccessDate).format("MM/DD/YYYY hh:mm:ss A")} ({timeString})</Text>
-                </View>
-            )
-        }else if(this.state.faultType === 'credentialsNotFound'){
-            return(
-                <View style={Styles.faultContainer}>
-                    <Text style={[Styles.attribute,{fontSize: 25}]}>Credentials Not Found</Text>
+    
+    approveOrDeny(method){
+        if(method === 'deny'){
+            Animated.timing(this.state.swipeAnim, { toValue: Dimensions.get('window').width, duration: 200}).start()
+            Animated.timing(this.state.fadeAnim, { toValue: 0, duration: 300 }).start()
+        }else if(method === 'approve'){
+            if(global.networkConnected){
+                var url = config.adminRouteProd + '/mobileAPI/logAction?lineID=' + this.state.line._id + '&lineName=' + this.state.line.name + '&resource=' + this.state.line.resource + '&recipientID=' + this.state.currentRecipientID;
+                return fetch(url, { method: "POST" }).then((response) => response.json())
+                    .then((responseJson) => {
+                        if (responseJson.success) {
+                            Animated.timing(this.state.swipeAnim, { toValue: -Dimensions.get('window').width, duration: 200 }).start()
+                            Animated.timing(this.state.fadeAnim, { toValue: 0, duration: 300 }).start()
+                        }
+                    })
+            }else{
+                var setObj = {
+                    type: '',
+                    remainingAttempts: 3,
+                    lastAccess: false
+                }
+                Animated.timing(this.state.swipeAnim, { toValue: -Dimensions.get('window').width, duration: 200 }).start()
+                Animated.timing(this.state.fadeAnim, { toValue: 0, duration: 300 }).start(() => {this.logOfflineApproval(this.state.line, this.state.recipient, setObj)})
+                
+            }
+        }
+    }
+    timeSince(date){
+        if(!date) return '';
+        date = moment(date);
+        var timeSinceString = '';
+        var now = moment()
+        var daysAgo = now.diff(date,'days');
+        if(daysAgo > 0){
+            timeSinceString += daysAgo + ((daysAgo === 1) ? ' day, ' : ' days, ');
+            date.add(daysAgo,'days');
+        }
+        var hoursAgo = now.diff(date,'hours');
+        if (hoursAgo > 0) {
+            timeSinceString += hoursAgo + ((hoursAgo === 1) ? ' hour, ' : ' hours, ');
+            date.add(hoursAgo, 'hours');
+        }
+        var minutesAgo = now.diff(date, 'minutes');
+        if (minutesAgo > 0) {
+            timeSinceString += minutesAgo + ((minutesAgo === 1) ? ' minute ' : ' minutes ');
+        }
+        if(timeSinceString === '')
+            return 'Less than a minute ago'
+        timeSinceString += 'ago'
+
+        return timeSinceString;
+    }
+    renderTimeSince() {
+        if (this.state.type === 'credentialsNotFound') {
+            return (
+                <View style={[Styles.faultContainer, Styles.resultContainer]}>
+                    <Text style={[Styles.attribute, { fontSize: 25 }]}>Credentials Not Found</Text>
                     <Text style={[Styles.attribute, { fontSize: 22 }]}>Please Try Again</Text>
                     <Text style={Styles.attribute}>Attempts Remaining: {this.state.remainingAttempts}</Text>
                 </View>
             )
-        }else if(this.state.faultType === 'maxAttemptsReached'){
-            return(
-                <View style={Styles.faultContainer}>
-                    <Text style={[Styles.attribute, Styles.headerText]}>Access Denied: Maximum Attempts Have Been Reached</Text>
+        } else if (this.state.type === 'maxAttemptsReached'){
+            return (
+                <View style={[Styles.faultContainer, Styles.resultContainer]}>
+                    <Text style={[Styles.attribute, { fontSize: 25 }]}>Max Attempts Have Been Reached</Text>
                 </View>
             )
+        } else if (this.state.lastAccess || this.state.type === 'firstAccess'){
+            return (
+                <Animated.View style={{ opacity: this.state.fadeAnim, transform: [{ translateX: this.state.swipeAnim }, { perspective: 1000}], marginTop: 15}}>
+                    <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient', { recipient: this.state.recipient })}>
+                        <View style={Styles.successContainer}>
+
+                            {/* <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient', {recipient: this.state.recipient})}> */}
+                                <Text style={Styles.attribute}>Touch To View Recipient Access History</Text>
+                            {/* </TouchableOpacity> */}
+                            {this.state.type === 'firstAccess' && <Text style={Styles.attribute}>This is the first access by this recipient</Text>}
+
+                            {this.state.type !== 'firstAccess' && 
+                                <View>
+                                    <Text style={Styles.attribute}>Last Line Access: {moment(this.state.lastAccess).format("MM/DD/YYYY hh:mm:ss A")}</Text>
+                                    <Text style={[Styles.attribute, {fontSize: 22}]}>{this.timeSince(this.state.lastAccess)}</Text>
+                                </View>
+                            }
+                            
+                        </View>
+                        <View style={Styles.resultButtonContainer}>
+                            <TouchableOpacity onPress={() => this.approveOrDeny('approve')} style={Styles.approveButton}>
+                                <Text style={Styles.buttonText}>Approve</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.approveOrDeny('deny')} style={Styles.denyButton}>
+                                <Text style={Styles.buttonText}>Deny</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </TouchableOpacity>
+                </Animated.View>
+            )
         }
-    }
-    renderAccessSuccess(){
-        if (this.state.accessSuccess === false)
-            return
-        var faultDate = moment(this.state.currentSuccess.date);
-        var now = moment();
-        var validAccessDate = moment(faultDate).add(this.state.line.accessFrequency, 'hours');
-        var timeString = this.state.line.accessFrequency + ' hour(s) from now'
-        return (
-            <View style={Styles.successContainer}>
-                <Text style={[Styles.attribute, Styles.headerText]}>Successful Access</Text>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient',{recipient: this.state.recipient})}>
-                    <Text style={Styles.attribute}>Name: {this.state.recipient.firstName} {this.state.recipient.lastName}</Text>
-                    <Text style={Styles.attribute}>Language(s): {this.state.recipient.languages}</Text>
-                </TouchableOpacity>
-                <View style={{ borderBottomColor: '#FFF', borderBottomWidth: 1, marginTop: 20, marginBottom: 20 }}/>
-                <Text style={Styles.attribute}>Last Line Access: {moment(this.state.currentSuccess.date).format("MM/DD/YYYY hh:mm:ss A")}</Text>
-                <Text style={Styles.attribute}>Next Valid Access: {moment(validAccessDate).format("MM/DD/YYYY hh:mm:ss A")} ({timeString})</Text>
-            </View>
-        )
     }
     render() {
         return (
             <View style={Styles.container}>
-                {/* <Text>{this.state.offlineRecipientActionsArr.length} {this.state.offlineRecipientsArr.length} {this.state.offlineActionsQueueArr.length}</Text> */}
                 <View style={Styles.contentContainer}>
-                    <Text style={[Styles.lineAttribute, Styles.headerText, {marginLeft:20}]}>Name: {this.state.line.name}</Text>
-                    <ScrollView>
-                        <View style={Styles.lineInfo}>
-                            <Text style={Styles.lineAttribute}>Resource: {this.state.line.resource}</Text>
-                            <Text style={Styles.lineAttribute}>Capacity: {this.state.line.currentCapacity}/{this.state.line.capacity}</Text>
-                            <Text style={Styles.lineAttribute}>Open - Close: {this.state.line.openCloseTime}</Text>
-                            <Text style={Styles.lineAttribute}>Access Frequency: {this.state.line.accessFrequency} hrs</Text>
-                        </View>
-                        <Text>{this.state.errorMessage}</Text>
-                    
-                        {this.renderAccessFault()}
-                        {this.renderAccessSuccess()}
-                    </ScrollView>
-                    {/* <Text style={{width: '75%', alignSelf: 'center', fontSize: 20}}>Recipient Currently Accessing: {this.state.currentRecipientID}</Text> */}
-                    <View style={Styles.buttonContainer}>
-                        <TouchableOpacity style={Styles.accessButton} onPress={() => this.attemptLineAccess()}>
-                            <Text style={Styles.accessButtonText}>Access Line</Text>
-                        </TouchableOpacity>
-                        <View style={{ borderLeftColor: '#FFF', borderLeftWidth: 1, marginTop: 0, marginLeft: 0 }} />
-                        {global.currentlyLoggedIn.type === 'admin' && 
-                            <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: this.state.line, returnData: this.returnData.bind(this)})}>
-                                <Text style={Styles.accessButtonText}>Edit Line</Text>
-                            </TouchableOpacity>
-                        }
+                    <View style={Styles.lineContainer}>
+                        <Text style={[Styles.lineContainerText, { fontSize: 25 }]}>Line Name: {this.state.line.name}</Text>
+                        <Text style={Styles.lineContainerText}>Resource: {this.state.line.resource}</Text>
+                        <Text style={Styles.lineContainerText}>Open - Close: {this.state.line.openCloseTime}</Text>
+                        <Text style={Styles.lineContainerText}>Date Created: {moment(this.state.line.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
                     </View>
+                    <Text>{this.state.errorMessage}</Text>
+                    {this.renderTimeSince()}
                 </View>
+                <View style={Styles.buttonContainer}>
+                    <TouchableOpacity style={[Styles.accessButton,{marginRight: 10}]} onPress={() => this.attemptLineAccess()}>
+                        <Text style={Styles.buttonText}>Scan Finger</Text>
+                    </TouchableOpacity>
+                    {global.currentlyLoggedIn.type === 'admin' && 
+                        <TouchableOpacity style={[Styles.accessButton,{marginLeft: 10}]} onPress={() => this.props.navigation.navigate('EditRecord', { record: this.state.line, returnData: this.returnData.bind(this)})}>
+                            <Text style={Styles.buttonText}>Edit Line</Text>
+                        </TouchableOpacity>
+                    }
+                </View>
+                
             </View>
         )
     }
@@ -351,6 +402,7 @@ const Styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+        padding: 10
     },
     headerText:{
         fontSize: 25,
@@ -358,12 +410,15 @@ const Styles = StyleSheet.create({
     contentContainer:{
         flex: 1,
         flexDirection: 'column',
-        justifyContent: 'space-between'
+        // justifyContent: 'space-between'
     },
     faultContainer:{
         justifyContent: 'space-between',
         padding: 20,
-        backgroundColor: '#C02C33'
+        backgroundColor: '#C02C33',
+        margin: 10,
+        borderRadius: 3,
+        elevation: 3
     },
     attribute:{
         fontSize: 18,
@@ -372,39 +427,96 @@ const Styles = StyleSheet.create({
     successContainer:{
         justifyContent: 'space-between',
         padding: 20,
-        backgroundColor: '#689F38'
+        backgroundColor: '#689F38',
+        borderRadius: 3,
+        elevation: 3
     },
-    attribute: {
+    resultButtonContainer:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+        elevation: 3
+    },
+    attribute:{
         fontSize: 18,
         color: '#FFF'
+    },
+    lineContainer: {
+        justifyContent: 'flex-start',
+        padding: 30,
+        backgroundColor: '#FFF',
+        borderColor: '#000',
+        // margin: 10,
+        borderRadius: 3,
+        elevation: 3,
+    },
+    resultContainer:{
+        margin: 10,
+        borderRadius: 3,
+        elevation: 3,
     },
     lineInfo:{
         justifyContent: 'space-between',
         paddingTop: 20,
         paddingBottom: 20,
-        borderBottomColor: '#000',
-        borderBottomWidth: 1,
+        // borderBottomColor: '#000',
+        // borderBottomWidth: 1,
         marginLeft: 20,
-        marginRight: 20
+        marginRight: 20,
+    },
+    lineContainerText: {
+        fontSize: 18,
     },
     lineAttribute:{
         fontSize: 20
     },
-    buttonContainer:{
-        flexDirection: 'row'
+    approveButton:{
+        width: '49%',
+        height: 50,
+        backgroundColor: '#689F38',
+        alignItems: 'center',
+        alignSelf: 'center',
+        justifyContent: 'center',
+        borderRadius: 3,
+        borderRadius: 3,
+        elevation: 3,
+        // marginRight: 5
+    },
+    denyButton:{
+        width: '49%',
+        height: 50,
+        backgroundColor: '#C02C33',
+        alignItems: 'center',
+        alignSelf: 'center',
+        justifyContent: 'center',
+        borderRadius: 3,
+        borderRadius: 3,
+        elevation: 3,
+        // marginLeft: 5
+    },
+    buttonContainer: {
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+        // padding: 10
     },
     accessButton:{
         backgroundColor: '#689F38',
         padding: 10,
         flex:1,
         // maxWidth: '100%',
-        height: 50,
+        height: 75,
         alignItems: 'center',
         alignSelf: 'center',
         justifyContent:'center',
+        borderRadius: 3,
+        elevation: 3,
+        margin: 10
     },
-    accessButtonText:{
+    buttonText:{
         color: '#FFF',
-        alignSelf: 'center'
+        alignSelf: 'center',
+        fontSize: 20
     },
+    
 })

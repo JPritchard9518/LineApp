@@ -69,7 +69,7 @@ export default class EditRecord extends React.Component {
     }
     renderTextInput(key,index){
         if(key === 'password') return;
-        var keyboardType = (['capacity','currentCapacity'].indexOf(key) > -1) ? "numeric" : "default";
+        var keyboardType = ([].indexOf(key) > -1) ? "numeric" : "default"; // Place numeric keyboard types inside array
         return(
             <View key={key} style={Styles.inputContainer}>
                 <Text>{key}</Text>
