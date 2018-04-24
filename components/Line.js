@@ -15,7 +15,7 @@ import {
 import config from '../config.json';
 import moment from 'moment';
 
-import Fingerprint from '../NativeModules/Fingerprint';
+// import Fingerprint from '../NativeModules/Fingerprint';
 
 export default class Line extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -48,7 +48,7 @@ export default class Line extends React.Component {
         // this.approveOrDeny = this.approveOrDeny.bind(this);
     }
     componentDidMount(){
-        Fingerprint.getReaders((msg) => { this.setState({errorMessage:msg})})
+        // Fingerprint.getReaders((msg) => { this.setState({errorMessage:msg})})
         if (!global.networkConnected) {
             this.setOfflineRecip();
             this.setOfflineActions();

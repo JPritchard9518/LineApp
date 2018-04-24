@@ -8,9 +8,12 @@ import {
     TouchableOpacity,
     TextInput,
     ScrollView,
-    Keyboard
+    Keyboard,
+    Switch
 } from 'react-native'
 import config from '../config.json';
+
+// import Checkbox from 'react-native-android-checkbox'
 
 export default class EditRecord extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -33,12 +36,22 @@ export default class EditRecord extends React.Component {
         var recordKeys = Object.keys(record)
         this.state = {
             record: record,
-            recordKeys: recordKeys
+            recordKeys: recordKeys,
+            permissionTypes: []
         }
         
     }
     componentWillReceiveProps(){
         navigationOptions.title = this.state.record.name;
+    }
+    componentWillMount(){
+        url = config.adminRouteProd + '/mobileAPI/getPermissionTypes';
+        return fetch(url)
+            .then((response) => response.json())
+            .then((responseJson) => {
+                if(responseJson.success)
+                    this.setState({permissionTypes:responseJson.permissionTypes})
+            })
     }
     saveRecord(){
         Keyboard.dismiss()
@@ -67,12 +80,43 @@ export default class EditRecord extends React.Component {
         updatedRecord[key] = newValue;
         this.setState({record: updatedRecord})
     }
+    updateSwitch(value,switchPermission){
+        var updatedRecord = this.state.record;
+        if(value) // add permission
+            updatedRecord.permissions.push(this.permission)
+        else{ // remove permission
+            var permissionArray = updatedRecord.permissions.filter(permission => permission !== switchPermission)
+            updatedRecord.permissions = permissionArray;
+        }
+        this.setState({record:updatedRecord})
+
+    }
+    renderPermission(permission,userPermissions){
+        var hasPermission = (userPermissions.indexOf(permission.name) > -1) ? true : false;
+        return(
+            <View key={permission.name} style={{flex:1, flexDirection:'row'}}>
+                <Switch
+                    value={hasPermission}
+                    ref={permission.name}
+                    permission={permission.name}
+                    onValueChange={((value) => this.updateSwitch(value, permission.name))}/>
+                <Text style={{paddingLeft: 20}}>{permission.label}</Text>
+            </View>
+        )
+    }
     renderTextInput(key,index){
         if(key === 'password') return;
+        if(key === 'permissions')
+            return(
+                <View key={key} style={Styles.inputContainer}>
+                    <Text>{key.replace(/([A-Z])/g, ' $1').replace(/^./, function (str) { return str.toUpperCase(); })}</Text>
+                    {this.state.permissionTypes.map((permission) => {return this.renderPermission(permission,this.state.record[key])})}
+                </View>
+            )
         var keyboardType = ([].indexOf(key) > -1) ? "numeric" : "default"; // Place numeric keyboard types inside array
         return(
             <View key={key} style={Styles.inputContainer}>
-                <Text>{key}</Text>
+                <Text>{key.replace(/([A-Z])/g, ' $1').replace(/^./, function (str) { return str.toUpperCase(); })}</Text>
                 <TextInput
                     keyboardType={keyboardType}
                     editable={!(key === '_id' || key === 'dateCreated' || key === 'type')}

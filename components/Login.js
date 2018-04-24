@@ -49,8 +49,10 @@ export default class LoginScreen extends Component {
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
-    userName = 'testAdmin';
-    password = 'password123';
+    userName = 'jpritchard9'
+    password = 'password123'
+    // userName = 'testAdmin';
+    // password = 'password123';
     var url = config.adminRouteProd + '/mobileAPI/login?userName=' + userName + '&password=' + password;
     return fetch(url).then((response) => response.json())
       .then((responseJson) => {
@@ -88,10 +90,8 @@ export default class LoginScreen extends Component {
           autoCapitalize='none'/>
         <View style={{ marginTop: 20 }}>
           <Text style={{fontSize:20, paddingBottom: 20}}>Testing Credentials:</Text>
-          <Text>LM User Name: testLM</Text>
+          <Text>LM User Name: XXXXXX</Text>
           <Text style={{paddingBottom: 20}}>Password: password123</Text>
-          <Text>Admin User Name: testAdmin</Text>
-          <Text>Password: password123</Text>
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.loginButton} onPress={() => this.login()}>

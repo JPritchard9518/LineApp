@@ -11,9 +11,9 @@ import {
 import moment from 'moment';
 import config from '../config.json';
 
-export default class AdminsList extends React.Component {
+export default class SystemsUsersList extends React.Component {
     static navigationOptions = {
-        title: 'Admins',
+        title: 'System Users',
         headerTitleStyle: {
             color: '#FFF',
         },
@@ -22,7 +22,7 @@ export default class AdminsList extends React.Component {
         super(props)
         const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
         this.state = {
-            admins: [],
+            systemUsers: [],
             dataSource: ds,
             loaded:false,
 
@@ -32,7 +32,7 @@ export default class AdminsList extends React.Component {
         this.setState({ line: lineObj })
     }
     componentDidMount(){
-        var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=admins';
+        var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=systemUsers';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
@@ -45,15 +45,15 @@ export default class AdminsList extends React.Component {
                 this.setState({ errorMessage: error })
             });
     }
-    renderRow(admin){
+    renderRow(systemUser){
         return (
-            <View style={Styles.adminContainer}>
-                {global.currentlyLoggedIn.type === 'admin' &&
-                    <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: admin, returnData: this.returnData.bind(this) })}>
-                        <Text style={Styles.adminContainerText}>First Name: {admin.firstName}</Text>
-                        <Text style={Styles.adminContainerText}>Last Name: {admin.lastName}</Text>
-                        <Text style={Styles.adminContainerText}>User Name: {admin.userName}</Text> 
-                        <Text style={Styles.adminContainerText}>Date Created: {moment(admin.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
+            <View style={Styles.systemUsersContainer}>
+                {global.currentlyLoggedIn.type === 'systemUser' &&
+                    <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: systemUser, returnData: this.returnData.bind(this) })}>
+                        <Text style={Styles.systemUsersContainerText}>First Name: {systemUser.firstName}</Text>
+                        <Text style={Styles.systemUsersContainerText}>Last Name: {systemUser.lastName}</Text>
+                        <Text style={Styles.systemUsersContainerText}>User Name: {systemUser.userName}</Text> 
+                        <Text style={Styles.systemUsersContainerText}>Date Created: {moment(systemUser.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
                     </TouchableOpacity>
                 }
                 
@@ -88,7 +88,7 @@ const Styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center'
     },
-    adminContainer: {
+    systemUsersContainer: {
         padding: 30,
         backgroundColor: '#FFF',
         borderColor: '#000',
@@ -97,7 +97,7 @@ const Styles = StyleSheet.create({
         borderRadius: 3,
         elevation: 3
     },
-    adminContainerText: {
+    systemUsersContainerText: {
         fontSize: 18
     }
 })
