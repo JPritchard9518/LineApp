@@ -17,6 +17,7 @@ import moment from 'moment';
 import config from '../config.json';
 import DatePicker from 'react-native-datepicker';
 import CountryPicker from 'react-native-country-picker-modal'
+import { NavigationActions } from 'react-navigation';
 
 export default class NewRecipient extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -84,7 +85,29 @@ export default class NewRecipient extends React.Component {
         }).then((response) => response.json())
             .then((responseJson) => {
                 if (responseJson.success) {
-                    this.setState({message: "Recipient Successfully Added"})
+                    // this.setState({message: "Recipient Successfully Added"})
+                    const newRecipientAction = NavigationActions.reset({
+                        index: 0,
+                        actions: [
+                            NavigationActions.navigate({ routeName: 'Add New Recipient' })
+                        ],
+                    });
+                    const resetAction = NavigationActions.reset({
+                        index: 0,
+                        actions: [
+                            NavigationActions.navigate({ routeName: 'Lines' })
+                        ],
+                    });
+                    return Alert.alert(
+                        "Recipient Successfully Added!",
+                        "Would you like to add another new recipient, or return to the lines list?",
+                        [
+                            { text: 'New Recipient', onPress: () => this.props.navigation.dispatch(newRecipientAction)},
+                            { text: 'Lines List', onPress: () => this.props.navigation.dispatch(resetAction)}
+                        ],
+                        { cancelable: false}
+                    )
+                    
                 } else {
                     this.setState({message: "Error: Recipient Could Not Be Added"})
                 }

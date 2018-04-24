@@ -29,7 +29,8 @@ const LineStack = StackNavigator({
   "Lines": {screen: LinesList},
   "Line": {screen: Line},
   "Recipient": {screen: Recipient},
-  "EditRecord": {screen: EditRecord}
+  "EditRecord": {screen: EditRecord},
+  "Add New Recipient": { screen: NewRecipient },
 },{
     headerMode: 'none',
     initialRouteName: 'Lines'

@@ -50,7 +50,7 @@ export default class LoginScreen extends Component {
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
-    userName = 'jpritchard9'
+    userName = 'testUser'
     password = 'password123'
     // userName = 'testAdmin';
     // password = 'password123';
@@ -84,7 +84,7 @@ export default class LoginScreen extends Component {
 
     return (
       <View style={styles.container}>
-        <Text style={{ color: (global.networkConnected) ? '#689F38' : '#BE2E37'}}>{(global.networkConnected) ? "Connected":"Not Connected"}</Text>
+        <Text style={{ color: (global.networkConnected) ? '#689F38' : '#BE2E37'}}>{(global.networkConnected) ? "Connected":"Not Connected - Please Connect to Network to Login"}</Text>
         <Text style={styles.header}>Login</Text>
         <TextInput
           ref="userName"
@@ -101,18 +101,18 @@ export default class LoginScreen extends Component {
           autoCapitalize='none'/>
         <View style={{ marginTop: 20 }}>
           <Text style={{fontSize:20, paddingBottom: 20}}>Testing Credentials:</Text>
-          <Text>LM User Name: XXXXXX</Text>
+          <Text>Username: testUser</Text>
           <Text style={{paddingBottom: 20}}>Password: password123</Text>
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.loginButton} onPress={() => this.login()}>
-            <Text style={styles.loginButtonText}>Login</Text>
+          <TouchableOpacity style={styles.button} onPress={() => this.login()}>
+            <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.loginButton} onPress={this.openScanApp1}>
-            <Text style={styles.loginButtonText}>Launch Settings 1</Text>
+          <TouchableOpacity style={styles.button} onPress={this.openScanApp1}>
+            <Text style={styles.buttonText}>Launch Settings 1</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.loginButton} onPress={this.openScanApp2}>
-            <Text style={styles.loginButtonText}>Launch Settings 2</Text>
+          <TouchableOpacity style={styles.button} onPress={this.openScanApp2}>
+            <Text style={styles.buttonText}>Launch Settings 2</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.errorContainer}>
@@ -139,7 +139,11 @@ const styles = StyleSheet.create({
     paddingBottom: 30
   },
   buttonContainer: {
-    marginTop: 30
+    marginTop: 30,
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'column',
   },
   errorContainer: {
     paddingTop: 30,
@@ -147,19 +151,21 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
   },
-  loginButton: {
+  button: {
+    width: '50%',
+    marginTop: 10,
+    height: 50,
     backgroundColor: '#689F38',
-    paddingLeft: 50,
-    paddingRight: 50,
-    // width: '50%',
-    height: 40,
     alignItems: 'center',
     alignSelf: 'center',
     justifyContent: 'center',
-    marginTop: 10
+    borderRadius: 3,
+    borderRadius: 3,
+    elevation: 3,
   },
-  loginButtonText: {
+  buttonText: {
     color: '#FFF',
-    alignSelf: 'center'
+    alignSelf: 'center',
+    fontSize: 20
   },
 });
