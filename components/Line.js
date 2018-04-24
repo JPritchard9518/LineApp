@@ -386,7 +386,7 @@ export default class Line extends React.Component {
                     <TouchableOpacity style={[Styles.accessButton,{marginRight: 10}]} onPress={() => this.attemptLineAccess()}>
                         <Text style={Styles.buttonText}>Scan Finger</Text>
                     </TouchableOpacity>
-                    {global.currentlyLoggedIn.type === 'admin' && 
+                    {global.currentlyLoggedIn.permissions.indexOf('editLines') > -1 && 
                         <TouchableOpacity style={[Styles.accessButton,{marginLeft: 10}]} onPress={() => this.props.navigation.navigate('EditRecord', { record: this.state.line, returnData: this.returnData.bind(this)})}>
                             <Text style={Styles.buttonText}>Edit Line</Text>
                         </TouchableOpacity>
