@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   Keyboard,
   NetInfo,
-  AsyncStorage
+  AsyncStorage,
+  NativeModules
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import config from '../config.json';
@@ -68,6 +69,16 @@ export default class LoginScreen extends Component {
         this.setState({ errorMessage: error })
       });
   }
+  openScanApp1(){
+    NativeModules.OpenScanApp.openScanAppAndValidate(data => {
+      console.log('call back data validate',data)
+    })
+  }
+  openScanApp2() {
+    NativeModules.OpenScanApp.openScanAppAndEnroll(fid => {
+      console.log('call back data enroll', fid)
+    })
+  }
   render() {
     const { navigate } = this.props.navigation;
 
@@ -96,6 +107,12 @@ export default class LoginScreen extends Component {
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.loginButton} onPress={() => this.login()}>
             <Text style={styles.loginButtonText}>Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.loginButton} onPress={this.openScanApp1}>
+            <Text style={styles.loginButtonText}>Launch Settings 1</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.loginButton} onPress={this.openScanApp2}>
+            <Text style={styles.loginButtonText}>Launch Settings 2</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.errorContainer}>
@@ -139,6 +156,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
     justifyContent: 'center',
+    marginTop: 10
   },
   loginButtonText: {
     color: '#FFF',

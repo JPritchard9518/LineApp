@@ -9,7 +9,9 @@ import {
     ActivityIndicator,
     TextInput,
     ScrollView,
-    Keyboard
+    Keyboard,
+    NativeModules,
+    Alert
 } from 'react-native';
 import moment from 'moment';
 import config from '../config.json';
@@ -40,6 +42,7 @@ export default class NewRecipient extends React.Component {
                 specialNeeds: "",
                 notes: "",
                 familyMembers: [],
+                fid: ""
             },
             customFields:[],
             message: '',
@@ -47,6 +50,7 @@ export default class NewRecipient extends React.Component {
         };
         this.saveRecipient = this.saveRecipient.bind(this);
         this.addFamilyMember = this.addFamilyMember.bind(this);
+        this.scanFinger = this.scanFinger.bind(this);
     }
     componentDidMount() {
         var url = config.adminRouteProd + '/mobileAPI/retrieveSettings?type=recipient';
@@ -63,6 +67,16 @@ export default class NewRecipient extends React.Component {
     }
     saveRecipient() {
         Keyboard.dismiss()
+        if(this.state.record.fid === ""){
+            return Alert.alert(
+                'Fingerprint Not Captured',
+                'A recipient may not be saved without a captured fingerprint. Please press the "Scan Finger" button.',
+                [
+                    { text: 'OK' },
+                ],
+                { cancelable: false }
+            )
+        }
         var data = JSON.stringify(this.state.record)
         var url = config.adminRouteProd + '/mobileAPI/saveRecipient?data=' + data;
         return fetch(url, {
@@ -78,6 +92,13 @@ export default class NewRecipient extends React.Component {
             .catch((error) => {
                 this.setState({ errorMessage: error })
             });
+    }
+    scanFinger(){
+        NativeModules.OpenScanApp.openScanAppAndEnroll(fid => {
+            var record = this.state.record;
+            record.fid = fid;
+            this.setState({record:record,message: 'Fingerprint ID successfully captured'})
+        })
     }
     updateFamText(newValue,key,index){
         var updateRecord = this.state.record;
@@ -267,14 +288,16 @@ export default class NewRecipient extends React.Component {
                     {this.state.customFields.map((key,index) => this.renderCustomFields(key,index))}
                     {this.renderFamilyInput()}
                 </ScrollView>
-                <TouchableOpacity style={Styles.saveButton} onPress={() => this.addFamilyMember()}>
-                    <Text style={Styles.saveButtonText}>Add Family Member</Text>
+                <TouchableOpacity style={Styles.button} onPress={() => this.addFamilyMember()}>
+                    <Text style={Styles.buttonText}>Add Family Member</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={Styles.saveButton}>
-                    <Text style={Styles.saveButtonText}>Scan Finger</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={Styles.saveButton} onPress={() => this.saveRecipient()}>
-                    <Text style={Styles.saveButtonText}>Save Recipient</Text>
+                { this.state.record.fid === "" && 
+                    <TouchableOpacity style={Styles.button} onPress={() => this.scanFinger()}>
+                        <Text style={Styles.buttonText}>Scan Finger</Text>
+                    </TouchableOpacity>
+                }
+                <TouchableOpacity style={Styles.button} onPress={() => this.saveRecipient()}>
+                    <Text style={Styles.buttonText}>Save Recipient</Text>
                 </TouchableOpacity>
                 <View style={Styles.messageContainer}>
                     <Text style={Styles.messageText}>{this.state.message}</Text>
@@ -299,17 +322,22 @@ const Styles = StyleSheet.create({
         paddingLeft: 20,
         paddingRight: 20
     },
-    saveButton: {
+    button: {
+        width: '95%',
+        marginTop: 10,
+        height: 50,
         backgroundColor: '#689F38',
-        padding: 10,
-        width: 200,
-        borderRadius: 5,
         alignItems: 'center',
         alignSelf: 'center',
-        marginTop: 10,
+        justifyContent: 'center',
+        borderRadius: 3,
+        borderRadius: 3,
+        elevation: 3,
     },
-    saveButtonText: {
-        color: '#FFF'
+    buttonText: {
+        color: '#FFF',
+        alignSelf: 'center',
+        fontSize: 20
     },
     messageContainer:{
         width: '100%',

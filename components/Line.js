@@ -10,7 +10,8 @@ import {
     AsyncStorage,
     Animated,
     Easing,
-    Dimensions
+    Dimensions,
+    NativeModules
 } from 'react-native';
 import config from '../config.json';
 import moment from 'moment';
@@ -41,7 +42,7 @@ export default class Line extends React.Component {
             offlineRecipientsArr: [],
             offlineRecipientActionsArr: [],
             offlineActionsQueueArr: [],
-            currentRecipientID: "5aba6683b3a25d0019f5cbc2" // Need to update this once finger is scanned
+            currentRecipientID: "" // Need to update this once finger is scanned
         };
         this.attemptLineAccess = this.attemptLineAccess.bind(this);
         this.renderTimeSince = this.renderTimeSince.bind(this);
@@ -90,10 +91,15 @@ export default class Line extends React.Component {
     }
     attemptLineAccess(){
         // Scan finger here
-        if(global.networkConnected)
-            return this.onlineAccessMethod();
-        else
-            return this.offlineAccessMethod();
+        NativeModules.OpenScanApp.openScanAppAndValidate(recipID => {
+            this.setState({currentRecipientID: recipID},function(){
+                if (global.networkConnected)
+                    return this.onlineAccessMethod();
+                else
+                    return this.offlineAccessMethod();
+            })
+            
+        })
     }
     offlineAccessMethod(){
         if(this.state.remainingAttempts === 0){
