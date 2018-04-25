@@ -29,6 +29,7 @@ export default class LoginScreen extends Component {
       connected: ''
     }
     this.login = this.login.bind(this);
+    this.openScanApp1 = this.openScanApp1.bind(this);
   }
   componentDidMount() {
     AsyncStorage.clear()
@@ -70,12 +71,13 @@ export default class LoginScreen extends Component {
       });
   }
   openScanApp1(){
-    NativeModules.OpenScanApp.openScanAppAndValidate(data => {
-      console.log('call back data validate',data)
-    })
+    NativeModules.OpenScanApp.openSettings1(data => {
+      this.setState({errorMessage:data})
+      // console.log('call back data validate',data)
+    });
   }
   openScanApp2() {
-    NativeModules.OpenScanApp.openScanAppAndEnroll(fid => {
+    NativeModules.OpenScanApp.openSettings2(fid => {
       console.log('call back data enroll', fid)
     })
   }

@@ -18,41 +18,50 @@ public class OpenScanAppModule extends ReactContextBaseJavaModule {
      */
     return "OpenScanApp";
   }
+  @ReactMethod
+  public void openSettings1(Callback cb){
+    Activity currentActivity = getCurrentActivity();
 
+    if (currentActivity == null) {
+      cb.invoke(false);
+      return;
+    }
+
+    try {
+      currentActivity.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS));
+      cb.invoke(true);
+    } catch (Exception e) {
+      cb.invoke(e.getMessage());
+    }
+  }
+  @ReactMethod
+  public void openSettings2(Callback cb){
+    Activity currentActivity = getCurrentActivity();
+
+    if (currentActivity == null) {
+      cb.invoke(false);
+      return;
+    }
+
+    try {
+      currentActivity.startActivity(new Intent(android.provider.Settings.ACTION_NETWORK_OPERATOR_SETTINGS));
+      cb.invoke(true);
+    } catch (Exception e) {
+      cb.invoke(e.getMessage());
+    }
+  }
   @ReactMethod
   public void openScanAppAndValidate(Callback cb) {
+    // int number = UruConnection.init_reader(m_connection);
+    // cb.invoke(number);
     cb.invoke("5aba6683b3a25d0019f5cbc2");
-    // Activity currentActivity = getCurrentActivity();
-
-    // if (currentActivity == null) {
-    //   cb.invoke(false);
-    //   return;
-    // }
-
-    // try {
-    //   currentActivity.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS));
-    //   cb.invoke(true);
-    // } catch (Exception e) {
-    //   cb.invoke(e.getMessage());
-    // }
+    
   }
   
   @ReactMethod
   public void openScanAppAndEnroll(Callback cb) {
     cb.invoke("XXXXXXXXXXXXXXXXXXXXX");
-    // Activity currentActivity = getCurrentActivity();
-
-    // if (currentActivity == null) {
-    //   cb.invoke(false);
-    //   return;
-    // }
-
-    // try {
-    //   currentActivity.startActivity(new Intent(android.provider.Settings.ACTION_NETWORK_OPERATOR_SETTINGS));
-    //   cb.invoke(true);
-    // } catch (Exception e) {
-    //   cb.invoke(e.getMessage());
-    // }
+    
   }
 
   /* constructor */

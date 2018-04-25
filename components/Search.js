@@ -60,22 +60,13 @@ export default class Search extends React.Component {
             <View style={Styles.container}>
                 <Text style={Styles.headerText}>Find Recipient By Fingerprint</Text>
                 <View style={Styles.buttonContainer}>
-                    <TouchableOpacity style={Styles.scanButton} onPress={() => this.findUserByFinger()}>
-                        <Text style={Styles.scanButtonText}>Scan Finger</Text>
+                    <TouchableOpacity style={Styles.button} onPress={() => this.findUserByFinger()}>
+                        <Text style={Styles.buttonText}>Scan Finger</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={Styles.errorContainer}>
                     <Text style={Styles.errorMessage}>{this.state.errorMessage}</Text>
                 </View>
-                {/* <Picker
-                    style={{ width: '75%' }}
-                    selectedValue={this.state.searchType}
-                    onValueChange={(searchType) => this.setState({ searchType: searchType })}>
-                    <Picker.Item label="Lines" value="lines" />
-                    <Picker.Item label="Recipients" value="recipients" />
-                    <Picker.Item label="Line Managers" value="lineManagers" />
-                    <Picker.Item label="Admins" value="admins" />
-                </Picker> */}
             </View>
         )
     }
@@ -94,19 +85,22 @@ const Styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row'
     },
-    scanButton: {
-        backgroundColor: '#689F38',
-        padding: 10,
-        flex: 1,
-        // maxWidth: '100%',
+    button: {
+        width: '50%',
+        marginTop: 10,
         height: 50,
+        backgroundColor: '#689F38',
         alignItems: 'center',
         alignSelf: 'center',
         justifyContent: 'center',
+        borderRadius: 3,
+        borderRadius: 3,
+        elevation: 3,
     },
-    scanButtonText: {
+    buttonText: {
         color: '#FFF',
-        alignSelf: 'center'
+        alignSelf: 'center',
+        fontSize: 20
     },
     errorContainer:{
         paddingTop: 30

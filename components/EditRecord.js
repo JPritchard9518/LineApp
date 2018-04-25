@@ -13,8 +13,6 @@ import {
 } from 'react-native'
 import config from '../config.json';
 
-// import Checkbox from 'react-native-android-checkbox'
-
 export default class EditRecord extends React.Component {
     static navigationOptions = ({ navigation }) => {
         const { params } = navigation.state;

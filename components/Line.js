@@ -348,14 +348,12 @@ export default class Line extends React.Component {
                 <Animated.View style={{ opacity: this.state.fadeAnim, transform: [{ translateX: this.state.swipeAnim }, { perspective: 1000}], marginTop: 15}}>
                     <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient', { recipient: this.state.recipient })}>
                         <View style={Styles.successContainer}>
-
-                            {/* <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient', {recipient: this.state.recipient})}> */}
                                 <Text style={Styles.attribute}>Touch To View Recipient Access History</Text>
-                            {/* </TouchableOpacity> */}
                             {this.state.type === 'firstAccess' && <Text style={Styles.attribute}>This is the first access by this recipient</Text>}
-
                             {this.state.type !== 'firstAccess' && 
                                 <View>
+                                    <Text style={Styles.attribute}>Language(s): {this.state.recipient.languages}</Text>
+                                    <Text style={Styles.attribute}>Family Members: {this.state.recipient.familyMembers.length}</Text>
                                     <Text style={Styles.attribute}>Last Line Access: {moment(this.state.lastAccess).format("MM/DD/YYYY hh:mm:ss A")}</Text>
                                     <Text style={[Styles.attribute, {fontSize: 22}]}>{this.timeSince(this.state.lastAccess)}</Text>
                                 </View>
@@ -398,7 +396,6 @@ export default class Line extends React.Component {
                         </TouchableOpacity>
                     }
                 </View>
-                
             </View>
         )
     }
