@@ -43,7 +43,7 @@ export default class NewRecipient extends React.Component {
                 specialNeeds: "",
                 notes: "",
                 familyMembers: [],
-                fid: ""
+                fmd: ""
             },
             customFields:[],
             message: '',
@@ -68,7 +68,7 @@ export default class NewRecipient extends React.Component {
     }
     saveRecipient() {
         Keyboard.dismiss()
-        if(this.state.record.fid === ""){
+        if(this.state.record.fmd === ""){
             return Alert.alert(
                 'Fingerprint Not Captured',
                 'A recipient may not be saved without a captured fingerprint. Please press the "Scan Finger" button.',
@@ -117,9 +117,9 @@ export default class NewRecipient extends React.Component {
             });
     }
     scanFinger(){
-        NativeModules.OpenScanApp.openScanAppAndEnroll(fid => {
+        NativeModules.OpenScanApp.openScanAppAndEnroll(fmd => {
             var record = this.state.record;
-            record.fid = fid;
+            record.fmd = fmd;
             this.setState({record:record,message: 'Fingerprint ID successfully captured'})
         })
     }
@@ -314,7 +314,7 @@ export default class NewRecipient extends React.Component {
                 <TouchableOpacity style={Styles.button} onPress={() => this.addFamilyMember()}>
                     <Text style={Styles.buttonText}>Add Family Member</Text>
                 </TouchableOpacity>
-                { this.state.record.fid === "" && 
+                { this.state.record.fmd === "" && 
                     <TouchableOpacity style={Styles.button} onPress={() => this.scanFinger()}>
                         <Text style={Styles.buttonText}>Scan Finger</Text>
                     </TouchableOpacity>

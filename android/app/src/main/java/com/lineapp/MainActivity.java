@@ -2,8 +2,6 @@ package com.lineapp;
 
 import com.facebook.react.ReactActivity;
 
-import com.lineapp.fingerprint.*;
-
 public class MainActivity extends ReactActivity {
 
     /**

@@ -8,6 +8,11 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+
 public class OpenScanAppModule extends ReactContextBaseJavaModule {
 
   @Override
@@ -20,6 +25,10 @@ public class OpenScanAppModule extends ReactContextBaseJavaModule {
   }
   @ReactMethod
   public void openSettings1(Callback cb){
+    // PackageManager packageManager = getPackageManager();
+    // List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+    // int isIntentSafe = activities.size();
+    // cb.invoke(isIntentSafe);
     Activity currentActivity = getCurrentActivity();
 
     if (currentActivity == null) {
