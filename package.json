@@ -8,7 +8,7 @@
     "justin": "cd /Users/justinpritchard/Library/Android/sdk/tools && emulator -avd Pixel_2_XL_API_23",
     "android": "react-native run-android",
     "postinstall": "rm ./node_modules/react-native/local-cli/core/__fixtures__/files/package.json",
-    "android-mac": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && react-native run-android"
+    "android-clean": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && react-native run-android"
   },
   "dependencies": {
     "country-data": "0.0.31",
