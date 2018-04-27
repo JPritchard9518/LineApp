@@ -7,6 +7,7 @@ import {
     ListView,
     TouchableOpacity,
     ActivityIndicator,
+    AsyncStorage
 } from 'react-native';
 import moment from 'moment';
 import config from '../config.json';
@@ -24,14 +25,38 @@ export default class LinesList extends React.Component {
         this.state = {
             dataSource: ds,
             loaded: false,
+            errorMessage: "none"
+            // offlineLinesArr: []
         };
     }
     componentDidMount() {
+        if(global.networkConnected){
+            this.onlineMethod()
+        }else{
+            this.setOfflineLines()
+        }
+    }
+    async setOfflineLines() {
+        try {
+            const lines = await AsyncStorage.getItem('lines');
+            if (lines === null) lines = [];
+            this.setState({
+                loaded: true,
+                errorMessage: "Success",
+                dataSource: this.state.dataSource.cloneWithRows(JSON.parse(lines))
+            })
+            // this.offlineMethod()
+        } catch (error) {
+            // this.setState({ offlineLinesArr: [] })
+            this.setState({errorMessage: "error"})
+        }
+    }
+    onlineMethod(){
         var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=lines';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
-                    loaded:true,
+                    loaded: true,
                     dataSource: this.state.dataSource.cloneWithRows(responseJson)
                 })
 
@@ -40,6 +65,13 @@ export default class LinesList extends React.Component {
                 this.setState({ errorMessage: error })
             });
     }
+    // offlineMethod(){
+    //     var offlineLinesArr = this.state.offlineLinesArr;
+    //     this.setState({
+    //         loaded: true,
+    //         dataSource: thistate.dataSource.cloneWithRows(offlineLinesArr)
+    //     })
+    // }
     renderRow(line) {
         return (
             <TouchableOpacity onPress={() => this.props.navigation.navigate('Line',{line:line})} style={Styles.lineContainer}>
@@ -64,12 +96,14 @@ export default class LinesList extends React.Component {
             }else{
                 return(<Text style={{fontSize:18,padding:15}}>No Data To Show. Please Add a Line.</Text>)
             }
-        }else{
+        }else if(global.networkConnected){
             return(
                 <View style={Styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#0000ff" />
                 </View>
             )
+        }else{
+            return(<Text style={{ fontSize: 18, padding: 15 }}>No network connection. Go within network range, open the menu, and press "Prepare for Offline Use" if you anticipate being outside of network.</Text>)
         }
     }
 }
