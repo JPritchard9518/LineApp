@@ -41,10 +41,36 @@ export default class SideMenu extends React.Component {
     }
     _handleConnectionChange = (isConnected) => {
         global.networkConnected = isConnected;
+        const resetAction = NavigationActions.reset({
+            index: 0,
+            actions: [
+                NavigationActions.navigate({ routeName: 'Lines' })
+            ],
+        });
         if (global.networkConnected) {
+            this.setState({ downloadStatus: 2, message: 'Import Complete!', numDownloaded: 0 })
+            Alert.alert(
+                "The application has lost connection",
+                "You will be returned to the home screen. Please go within range of network. Open the menu and press \"Prepare for Offline Use\" if you expect to be outside of network range.",
+                [
+                    { text: 'Ok', onPress: () => this.props.navigation.dispatch(resetAction) }
+                ],
+                { cancelable: false }
+            )
             this.uploadQueue(true);
         }
         this.setState({ connected: isConnected})
+        if(!isConnected){
+            this.setState({ downloadStatus: 2, message: 'Import Complete!', numDownloaded: 0 })
+            Alert.alert(
+                "The application has found the network",
+                "In order to ensure that the most recent data is being accessed, you will be returned to the home screen.",
+                [
+                    { text: 'Ok', onPress: () => this.props.navigation.dispatch(resetAction) }
+                ],
+                { cancelable: false }
+            )
+        }
     }
     async uploadQueue(showMessage) {
         try {
@@ -88,15 +114,7 @@ export default class SideMenu extends React.Component {
                 { cancelable: false }
             )
         else{
-            return Alert.alert(
-                "Download Data For Offline Use?",
-                "Proceeding will return to the home screen",
-                [
-                    { text: 'Cancel' },
-                    { text: 'Proceed', onPress: () => this.queryCollections(0)}
-                ],
-                { cancelable: false }
-            )
+            this.queryCollections(0)
         }
     }
     queryCollections(index){
@@ -110,14 +128,7 @@ export default class SideMenu extends React.Component {
                 { cancelable: false }
             )
         else if(typeof collectionsToDownload[index] === 'undefined'){
-            const resetAction = NavigationActions.reset({
-                index: 0,
-                actions: [
-                    NavigationActions.navigate({ routeName: 'Lines' })
-                ],
-            });
             this.setState({downloadStatus: 2, message: 'Import Complete!', numDownloaded: 0})
-            setTimeout(() => this.props.navigation.dispatch(resetAction),500)
         }else{
             this.setState({ downloadStatus: 1, numDownloaded: index, message: (collectionsToDownload.length - index) + '/' + collectionsToDownload.length + ' collections left to import'},function(){
                 this.gatherResource(collectionsToDownload[index],index).done()

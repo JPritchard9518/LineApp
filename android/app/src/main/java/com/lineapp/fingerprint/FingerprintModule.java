@@ -1,10 +1,10 @@
 package com.lineapp.fingerprint;
 
-import com.digitalpersona.uareu.ReaderCollection;
-import com.digitalpersona.uareu.UareUException;
-import com.digitalpersona.uareu.UareUGlobal;
-import com.digitalpersona.uareu.Reader;
-import com.digitalpersona.uareu.Reader.Capabilities;
+// import com.digitalpersona.uareu.ReaderCollection;
+// import com.digitalpersona.uareu.UareUException;
+// import com.digitalpersona.uareu.UareUGlobal;
+// import com.digitalpersona.uareu.Reader;
+// import com.digitalpersona.uareu.Reader.Capabilities;
 
 
 import android.app.Activity;
@@ -23,12 +23,12 @@ import android.content.Context;
 
 import android.app.Application;
 
-import com.digitalpersona.uareu.Reader;
-import com.digitalpersona.uareu.Reader.Priority;
-import com.digitalpersona.uareu.UareUException;
+// import com.digitalpersona.uareu.Reader;
+// import com.digitalpersona.uareu.Reader.Priority;
+// import com.digitalpersona.uareu.UareUException;
 
-import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbHost;
-import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbException;
+// import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbHost;
+// import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -53,7 +53,7 @@ import android.hardware.usb.UsbManager;
 public class FingerprintModule extends ReactContextBaseJavaModule {
 
     // private String m_deviceName = "";
-    private ReaderCollection readers;
+    // private ReaderCollection readers;
 //    private static Globals instance;
 //    static
 //    {
