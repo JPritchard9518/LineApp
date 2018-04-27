@@ -2,11 +2,11 @@ import React from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 import { StackNavigator, DrawerNavigator } from 'react-navigation'
 import LoginScreen from './components/Login.js'
-import AdminsList from './components/AdminsList.js'
+import SystemUsersList from './components/SystemUsersList.js'
 import RecipientsList from './components/RecipientsList.js'
 import Recipient from './components/Recipient.js'
 import NewRecipient from './components/NewRecipient.js'
-import LineManagersList from './components/LineManagersList.js'
+// import LineManagersList from './components/LineManagersList.js'
 import LinesList from './components/LinesList.js'
 import Line from './components/Line.js'
 import EditRecord from './components/EditRecord.js'
@@ -29,25 +29,26 @@ const LineStack = StackNavigator({
   "Lines": {screen: LinesList},
   "Line": {screen: Line},
   "Recipient": {screen: Recipient},
-  "EditRecord": {screen: EditRecord}
+  "EditRecord": {screen: EditRecord},
+  "Add New Recipient": { screen: NewRecipient },
 },{
     headerMode: 'none',
     initialRouteName: 'Lines'
 })
-const AdminStack = StackNavigator({
-  "Admins": {screen: AdminsList},
+const SystemUsersStack = StackNavigator({
+  "SystemUsers": {screen: SystemUsersList},
   "EditRecord": {screen: EditRecord}
 },{
   headerMode: 'none',
-  initialRouteName: 'Admins'
+  initialRouteName: 'SystemUsers'
 })
-const LineManagerStack = StackNavigator({
-  "LineManagers": { screen: LineManagersList },
-  "EditRecord": { screen: EditRecord }
-}, {
-    headerMode: 'none',
-    initialRouteName: 'LineManagers'
-  })
+// const LineManagerStack = StackNavigator({
+//   "LineManagers": { screen: LineManagersList },
+//   "EditRecord": { screen: EditRecord }
+// }, {
+//     headerMode: 'none',
+//     initialRouteName: 'LineManagers'
+//   })
 const SearchStack = StackNavigator({
   "Search": {screen: Search},
   "Recipient": {screen: Recipient}
@@ -58,9 +59,9 @@ const SearchStack = StackNavigator({
 // drawer menu routes
 const DrawerStack = DrawerNavigator({
   "Lines": { screen: LineStack },
-  "Admins": { screen: AdminStack },
+  "SystemUsers": { screen: SystemUsersStack },
   "Recipients": { screen: RecipientStack },
-  "Line Managers": { screen: LineManagerStack },
+  // "Line Managers": { screen: LineManagerStack },
   "Add New Recipient": { screen: NewRecipient },
   "Search": { screen: Search },
 },

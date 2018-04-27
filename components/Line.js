@@ -10,12 +10,13 @@ import {
     AsyncStorage,
     Animated,
     Easing,
-    Dimensions
+    Dimensions,
+    NativeModules
 } from 'react-native';
 import config from '../config.json';
 import moment from 'moment';
 
-import Fingerprint from '../NativeModules/Fingerprint';
+// import Fingerprint from '../NativeModules/Fingerprint';
 
 export default class Line extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -41,14 +42,14 @@ export default class Line extends React.Component {
             offlineRecipientsArr: [],
             offlineRecipientActionsArr: [],
             offlineActionsQueueArr: [],
-            currentRecipientID: "5aba6683b3a25d0019f5cbc2" // Need to update this once finger is scanned
+            currentRecipientID: "" // Need to update this once finger is scanned
         };
         this.attemptLineAccess = this.attemptLineAccess.bind(this);
         this.renderTimeSince = this.renderTimeSince.bind(this);
         // this.approveOrDeny = this.approveOrDeny.bind(this);
     }
     componentDidMount(){
-        Fingerprint.getReaders((msg) => { this.setState({errorMessage:msg})})
+        // Fingerprint.getReaders((msg) => { this.setState({errorMessage:msg})})
         if (!global.networkConnected) {
             this.setOfflineRecip();
             this.setOfflineActions();
@@ -90,10 +91,15 @@ export default class Line extends React.Component {
     }
     attemptLineAccess(){
         // Scan finger here
-        if(global.networkConnected)
-            return this.onlineAccessMethod();
-        else
-            return this.offlineAccessMethod();
+        NativeModules.OpenScanApp.openScanAppAndValidate(recipID => {
+            this.setState({currentRecipientID: recipID},function(){
+                if (global.networkConnected)
+                    return this.onlineAccessMethod();
+                else
+                    return this.offlineAccessMethod();
+            })
+            
+        })
     }
     offlineAccessMethod(){
         if(this.state.remainingAttempts === 0){
@@ -342,14 +348,12 @@ export default class Line extends React.Component {
                 <Animated.View style={{ opacity: this.state.fadeAnim, transform: [{ translateX: this.state.swipeAnim }, { perspective: 1000}], marginTop: 15}}>
                     <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient', { recipient: this.state.recipient })}>
                         <View style={Styles.successContainer}>
-
-                            {/* <TouchableOpacity onPress={() => this.props.navigation.navigate('Recipient', {recipient: this.state.recipient})}> */}
                                 <Text style={Styles.attribute}>Touch To View Recipient Access History</Text>
-                            {/* </TouchableOpacity> */}
                             {this.state.type === 'firstAccess' && <Text style={Styles.attribute}>This is the first access by this recipient</Text>}
-
                             {this.state.type !== 'firstAccess' && 
                                 <View>
+                                    <Text style={Styles.attribute}>Language(s): {this.state.recipient.languages}</Text>
+                                    <Text style={Styles.attribute}>Family Members: {this.state.recipient.familyMembers.length}</Text>
                                     <Text style={Styles.attribute}>Last Line Access: {moment(this.state.lastAccess).format("MM/DD/YYYY hh:mm:ss A")}</Text>
                                     <Text style={[Styles.attribute, {fontSize: 22}]}>{this.timeSince(this.state.lastAccess)}</Text>
                                 </View>
@@ -386,13 +390,12 @@ export default class Line extends React.Component {
                     <TouchableOpacity style={[Styles.accessButton,{marginRight: 10}]} onPress={() => this.attemptLineAccess()}>
                         <Text style={Styles.buttonText}>Scan Finger</Text>
                     </TouchableOpacity>
-                    {global.currentlyLoggedIn.type === 'admin' && 
+                    {global.currentlyLoggedIn.permissions.indexOf('editLines') > -1 && 
                         <TouchableOpacity style={[Styles.accessButton,{marginLeft: 10}]} onPress={() => this.props.navigation.navigate('EditRecord', { record: this.state.line, returnData: this.returnData.bind(this)})}>
                             <Text style={Styles.buttonText}>Edit Line</Text>
                         </TouchableOpacity>
                     }
                 </View>
-                
             </View>
         )
     }

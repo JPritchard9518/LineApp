@@ -1,11 +1,20 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { NavigationActions } from 'react-navigation';
-import { ScrollView, Text, View, StyleSheet, NetInfo , TouchableOpacity , AsyncStorage} from 'react-native';
+import {
+    ScrollView,
+    Text,
+    View,
+    StyleSheet,
+    NetInfo,
+    TouchableOpacity,
+    AsyncStorage,
+    Alert
+} from 'react-native';
 import config from '../config.json';
 import moment from 'moment';
 
-const collectionsToDownload = ['lines','recipients','recipientActions','admins','lineManagers'];
+const collectionsToDownload = ['lines','systemUsers','recipients','recipientActions'];
 
 export default class SideMenu extends React.Component {
     constructor(props){
@@ -22,7 +31,7 @@ export default class SideMenu extends React.Component {
     componentDidMount() {
         NetInfo.isConnected.fetch().then((isConnected) => {
             global.networkConnected = isConnected;
-            this.uploadQueue()
+            this.uploadQueue(false)
             this.setState({ connected: isConnected })
         });
         NetInfo.isConnected.addEventListener('connectionChange', this._handleConnectionChange);
@@ -33,11 +42,11 @@ export default class SideMenu extends React.Component {
     _handleConnectionChange = (isConnected) => {
         global.networkConnected = isConnected;
         if (global.networkConnected) {
-            this.uploadQueue();
+            this.uploadQueue(true);
         }
         this.setState({ connected: isConnected})
     }
-    async uploadQueue() {
+    async uploadQueue(showMessage) {
         try {
             const value = await AsyncStorage.getItem('actionQueue');
             var url = config.adminRouteProd + '/mobileAPI/uploadQueue?queue=' + value
@@ -45,17 +54,18 @@ export default class SideMenu extends React.Component {
                 .then((response) => response.json())
                 .then((responseJson) => {
                     if(responseJson.success){
-                        this.clearQueue()
+                        this.clearQueue(showMessage)
                     }
                 }).done()
         } catch (error) {
             this.setState({message: 'Error uploading queue'});
         }
     }
-    async clearQueue() {
+    async clearQueue(showMessage) {
         try {
             await AsyncStorage.removeItem('actionQueue')
-            this.setState({ message: 'Queue successfully cleared at ' + moment().format("MM/DD/YYYY hh:mm:ss A"), uploadingQueue: false})
+            if(showMessage)
+                this.setState({ message: 'Queue successfully cleared at ' + moment().format("MM/DD/YYYY hh:mm:ss A"), uploadingQueue: false})
         } catch (error) {
             this.setState({mesage: 'Error clearing queue'})
         }
@@ -67,11 +77,47 @@ export default class SideMenu extends React.Component {
         });
         this.props.navigation.dispatch(navigateAction);
     }
+    beginDownloadProcess(){
+        if (!global.networkConnected)
+            return Alert.alert(
+                "Not Connected to Network",
+                "You must be connected to the network in order to prepare for offline use. Please come within range of the network and try again.",
+                [
+                    { text: 'Dismiss' },
+                ],
+                { cancelable: false }
+            )
+        else{
+            return Alert.alert(
+                "Download Data For Offline Use?",
+                "Proceeding will return to the home screen",
+                [
+                    { text: 'Cancel' },
+                    { text: 'Proceed', onPress: () => this.queryCollections(0)}
+                ],
+                { cancelable: false }
+            )
+        }
+    }
     queryCollections(index){
         if(!global.networkConnected)
-            return this.setState({message: "Please Connect to the Network"})
+            return Alert.alert(
+                "Not Connected to Network",
+                "You must be connected to the network in order to download data. Please be within range of the network and try again.",
+                [
+                    { text: 'Dismiss'},
+                ],
+                { cancelable: false }
+            )
         else if(typeof collectionsToDownload[index] === 'undefined'){
+            const resetAction = NavigationActions.reset({
+                index: 0,
+                actions: [
+                    NavigationActions.navigate({ routeName: 'Lines' })
+                ],
+            });
             this.setState({downloadStatus: 2, message: 'Import Complete!', numDownloaded: 0})
+            setTimeout(() => this.props.navigation.dispatch(resetAction),500)
         }else{
             this.setState({ downloadStatus: 1, numDownloaded: index, message: (collectionsToDownload.length - index) + '/' + collectionsToDownload.length + ' collections left to import'},function(){
                 this.gatherResource(collectionsToDownload[index],index).done()
@@ -131,23 +177,23 @@ export default class SideMenu extends React.Component {
                             <View style={Styles.navItemContainer}>
                                 <Text style={Styles.navItem} onPress={this.navigateToScreen('Lines')}>Lines</Text>
                             </View>
-                            {global.currentlyLoggedIn.type === 'admin' && 
-                                (<View>
-                                    <View style={Styles.navItemContainer}>
-                                        <Text style={Styles.navItem} onPress={this.navigateToScreen('Admins')}>Admins</Text>
-                                    </View>
-                                    <View style={Styles.navItemContainer}>
-                                        <Text style={Styles.navItem} onPress={this.navigateToScreen('Recipients')}>Recipients</Text>
-                                    </View>
-                                    <View style={Styles.navItemContainer}>
-                                        <Text style={Styles.navItem} onPress={this.navigateToScreen('Line Managers')}>Line Managers</Text>
-                                    </View>
-                                </View>)
+                            {global.currentlyLoggedIn.permissions.indexOf('viewRecipients') > -1 && 
+                                <View style={Styles.navItemContainer}>
+                                    <Text style={Styles.navItem} onPress={this.navigateToScreen('Recipients')}>Recipients</Text>
+                                </View>
+                                    
                             }
-                            <View style={Styles.navItemContainer}>
-                                <Text style={Styles.navItem} onPress={this.navigateToScreen('Add New Recipient')}>Add New Recipient</Text>
-                            </View>
-                            <TouchableOpacity style={Styles.navItemContainer} onPress={() => this.queryCollections(0)}>
+                            {global.currentlyLoggedIn.permissions.indexOf('viewSystemUsers') > -1 &&
+                                <View style={Styles.navItemContainer}>
+                                    <Text style={Styles.navItem} onPress={this.navigateToScreen('SystemUsers')}>System Users</Text>
+                                </View>
+                            }
+                            {global.currentlyLoggedIn.permissions.indexOf('createRecipients') > -1 && global.networkConnected && // Cannot add new recipient if not connected to network.
+                                <View style={Styles.navItemContainer}>
+                                    <Text style={Styles.navItem} onPress={this.navigateToScreen('Add New Recipient')}>Add New Recipient</Text>
+                                </View>
+                            }
+                            <TouchableOpacity style={Styles.navItemContainer} onPress={() => this.beginDownloadProcess()}>
                                 <Text style={Styles.navItem}>Prepare for Offline Use</Text>
                             </TouchableOpacity>
                             <Text style={Styles.navItem}>{this.state.message}</Text>
@@ -157,8 +203,7 @@ export default class SideMenu extends React.Component {
                 </ScrollView>
                 <View style={Styles.footerContainer}>
                     
-                    <Text style={{paddingLeft:10}}>Currently Logged In: {global.currentlyLoggedIn.firstName} {global.currentlyLoggedIn.lastName}</Text>
-                    <Text style={{padding: 15,paddingLeft: 10}}>Type: {global.currentlyLoggedIn.type}</Text>
+                    <Text style={{padding: 15,paddingLeft:10}}>Currently Logged In: {global.currentlyLoggedIn.firstName} {global.currentlyLoggedIn.lastName}</Text>
                     <View style={Styles.navItemContainer}>
                         <Text style={[Styles.navItem,Styles.logout]} onPress={this.navigateToScreen('loginStack')}>Logout</Text>
                     </View>

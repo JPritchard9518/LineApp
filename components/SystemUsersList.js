@@ -11,27 +11,28 @@ import {
 import moment from 'moment';
 import config from '../config.json';
 
-export default class LineManagersList extends React.Component {
+export default class SystemsUsersList extends React.Component {
     static navigationOptions = {
-        title: 'Line Managers',
+        title: 'System Users',
         headerTitleStyle: {
             color: '#FFF',
         },
     };
-    constructor(props) {
+    constructor(props){
         super(props)
         const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
         this.state = {
-            lineManagers: [],
+            systemUsers: [],
             dataSource: ds,
             loaded:false,
+
         };
     }
     returnData(lineObj) {
         this.setState({ line: lineObj })
     }
-    componentDidMount() {
-        var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=lineManagers';
+    componentDidMount(){
+        var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=systemUsers';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
@@ -44,17 +45,18 @@ export default class LineManagersList extends React.Component {
                 this.setState({ errorMessage: error })
             });
     }
-    renderRow(lineManager) {
+    renderRow(systemUser){
         return (
-            <View style={Styles.lineManagerContainer}>
-                {global.currentlyLoggedIn.type === 'admin' &&
-                    <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: lineManager, returnData: this.returnData.bind(this) })}>
-                        <Text style={Styles.lineManagerContainerText}>First Name: {lineManager.firstName}</Text>
-                        <Text style={Styles.lineManagerContainerText}>Last Name: {lineManager.lastName}</Text>
-                        <Text style={Styles.lineManagerContainerText}>User Name: {lineManager.userName}</Text> 
-                        <Text style={Styles.lineManagerContainerText}>Date Created: {moment(lineManager.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
+            <View style={Styles.systemUsersContainer}>
+                {global.currentlyLoggedIn.type === 'systemUser' &&
+                    <TouchableOpacity style={Styles.accessButton} onPress={() => this.props.navigation.navigate('EditRecord', { record: systemUser, returnData: this.returnData.bind(this) })}>
+                        <Text style={Styles.systemUsersContainerText}>First Name: {systemUser.firstName}</Text>
+                        <Text style={Styles.systemUsersContainerText}>Last Name: {systemUser.lastName}</Text>
+                        <Text style={Styles.systemUsersContainerText}>User Name: {systemUser.userName}</Text> 
+                        <Text style={Styles.systemUsersContainerText}>Date Created: {moment(systemUser.dateCreated).format("MM/DD/YYYY hh:mm:ss A")}</Text>
                     </TouchableOpacity>
                 }
+                
             </View>
         )
     }
@@ -73,6 +75,7 @@ export default class LineManagersList extends React.Component {
                 </View>
             )
         }
+        
     }
 }
 
@@ -85,7 +88,7 @@ const Styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center'
     },
-    lineManagerContainer: {
+    systemUsersContainer: {
         padding: 30,
         backgroundColor: '#FFF',
         borderColor: '#000',
@@ -94,7 +97,7 @@ const Styles = StyleSheet.create({
         borderRadius: 3,
         elevation: 3
     },
-    lineManagerContainerText: {
+    systemUsersContainerText: {
         fontSize: 18
     }
 })
