@@ -110,37 +110,26 @@ export default class Line extends React.Component {
         }
         var scannedID = this.state.currentRecipientID;
         var recipientsArr = this.state.offlineRecipientsArr;
-        var recipientFound = false;
-        var recipient;
+
+        var recipient = recipientsArr.find(recipient => scannedID === recipient._id);
         
-        // Search through offline recipients to find matching fingerprint credential
-        for(var i = 0; i < recipientsArr.length; i++){
-            console.log('scanned: ' + scannedID + ' recip: ' + recipientsArr[i]._id)
-            if(scannedID === recipientsArr[i]._id){
-                recipientFound = true;// Check for matching finger credentials
-                recipient = recipientsArr[i];
-                break;
-            }
-        }
-        if(!recipientFound){ // If credentials not found, give another attempt until 3 failures
+        if(typeof recipient === 'undefined'){ // If credentials not found, give another attempt until 3 failures
             var remainingAttempts = this.state.remainingAttempts;
             // Update the other states once we have sensor working
-            // return ?
-            this.setState({
+            return this.setState({
+                type: 'credentialsNotFound',
                 remainingAttempts: --remainingAttempts,
             })
         }else{
             var actions = this.state.offlineRecipientActionsArr;
             var matchingActionObj;
             var matchingActionObjFound = false;
+
             // Search through offline recipient actions to find existing access history
-            for(var i = 0; i < actions.length; i++){
-                if(actions[i].recipientID === recipient._id){
-                    matchingActionObj = actions[i];
-                    matchingActionObjFound = true;
-                    break;
-                }
-            }
+            var matchingActionObj = actions.find(action => recipient._id === action.recipientID)
+
+            if(typeof matchingActionObj !== 'undefined')
+                matchingActionObjFound = true;
             
             var offlineActionsQueue = this.state.offlineActionsQueueArr;
             if(typeof matchingActionObj === 'undefined'){
@@ -150,6 +139,7 @@ export default class Line extends React.Component {
                 }
             }
             // Search through offline actions queue for recent repeat offenders
+
             for (var i = 0; i < offlineActionsQueue.length; i++) {
                 if(offlineActionsQueue[i].recipientID === recipient._id){
                     matchingActionObjFound = true;

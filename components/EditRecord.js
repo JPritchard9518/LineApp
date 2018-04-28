@@ -11,6 +11,7 @@ import {
     Keyboard,
     Switch
 } from 'react-native'
+import { NavigationActions } from 'react-navigation';
 import config from '../config.json';
 
 export default class EditRecord extends React.Component {
@@ -35,7 +36,8 @@ export default class EditRecord extends React.Component {
         this.state = {
             record: record,
             recordKeys: recordKeys,
-            permissionTypes: []
+            permissionTypes: [],
+            errorMessage: '',
         }
         
     }
@@ -67,6 +69,32 @@ export default class EditRecord extends React.Component {
                         this.props.navigation.goBack()
                     } else {
                         // Handle failed save here
+                    }
+                })
+                .catch((error) => {
+                    this.setState({ errorMessage: error })
+                });
+    }
+    deleteRecord() {
+        Keyboard.dismiss()
+        var _id = this.state.record._id;
+        var type = this.state.record.type;
+        var url = config.adminRouteProd + '/mobileAPI/deleteRecord?_id=' + _id + '&type=' + type;
+        return fetch(url, {
+            method: "POST",
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    if (responseJson.success) {
+                        const resetAction = NavigationActions.reset({
+                            index: 0,
+                            actions: [
+                                NavigationActions.navigate({ routeName: 'Lines' })
+                            ],
+                        });
+                        this.props.navigation.dispatch(resetAction)
+                    } else {
+                        // Handle failed delete here
+                        this.setState({errorMessage: 'Record could not be deleted.'})
                     }
                 })
                 .catch((error) => {
@@ -124,14 +152,26 @@ export default class EditRecord extends React.Component {
         )
     }
     render() {
+        var upper = this.state.record.type.replace(/^\w/, function (chr) { // Capitalize the first letter of 'type' key
+            return chr.toUpperCase();
+        });
+        var permissionType = 'delete' + upper + 's'; // add delete to string to match permission type
         return (
             <View style={Styles.container}>
                 <ScrollView style={Styles.scrollView}>
                     {this.state.recordKeys.map((key,index) => this.renderTextInput(key,index))}
                 </ScrollView>
-                <TouchableOpacity style={Styles.saveButton} onPress={() => this.saveRecord()}>
-                    <Text style={Styles.saveButtonText}>Save Record</Text>
-                </TouchableOpacity>
+                <Text>{this.state.errorMessage}</Text>
+                <View style={Styles.buttonContainer}>
+                    <TouchableOpacity style={Styles.button} onPress={() => this.saveRecord()}>
+                        <Text style={Styles.buttonText}>Save Record</Text>
+                    </TouchableOpacity>
+                    {global.currentlyLoggedIn.permissions.indexOf(permissionType) > -1 && 
+                        <TouchableOpacity style={Styles.button} onPress={() => this.deleteRecord()}>
+                            <Text style={Styles.buttonText}>Delete Record</Text>
+                        </TouchableOpacity>
+                    }
+                </View>
             </View>
         )
     }
@@ -151,17 +191,27 @@ const Styles = StyleSheet.create({
         width: '90%',
         padding: 10
     },
-    saveButton:{
+    buttonContainer: {
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+        // padding: 10
+    },
+    button:{
         backgroundColor: '#689F38',
         padding: 10,
-        width: 200,
-        borderRadius: 5,
+        flex: 1,
+        height: 75,
         alignItems: 'center',
         alignSelf: 'center',
-        marginTop: 25,
-        marginBottom: 25
+        justifyContent: 'center',
+        borderRadius: 3,
+        elevation: 3,
+        margin: 10
     },
-    saveButtonText: {
-        color: '#FFF'
+    buttonText: {
+        color: '#FFF',
+        alignSelf: 'center',
+        fontSize: 20
     }
 })

@@ -21,7 +21,7 @@ export default class SideMenu extends React.Component {
         super(props);
         this.state = {
             connected: false,
-            downloadStatus: 0,
+            downloadStatus: 0, // 0: download hasn't begun, 1: download in progress, 2: download complete
             message: '',
             recipientActions: null,
             numDownloaded:0,
@@ -50,8 +50,8 @@ export default class SideMenu extends React.Component {
         if (global.networkConnected) {
             this.setState({ downloadStatus: 2, message: 'Import Complete!', numDownloaded: 0 })
             Alert.alert(
-                "The application has lost connection",
-                "You will be returned to the home screen. Please go within range of network. Open the menu and press \"Prepare for Offline Use\" if you expect to be outside of network range.",
+                "The application has found the network",
+                "In order to ensure that the most recent data is being accessed, you will be returned to the home screen.",
                 [
                     { text: 'Ok', onPress: () => this.props.navigation.dispatch(resetAction) }
                 ],
@@ -63,13 +63,14 @@ export default class SideMenu extends React.Component {
         if(!isConnected){
             this.setState({ downloadStatus: 2, message: 'Import Complete!', numDownloaded: 0 })
             Alert.alert(
-                "The application has found the network",
-                "In order to ensure that the most recent data is being accessed, you will be returned to the home screen.",
+                "The application has lost connection",
+                "You will be returned to the home screen. If you haven't already, please go within range of network. Open the menu and press \"Prepare for Offline Use\" if you expect to be outside of network range.",
                 [
                     { text: 'Ok', onPress: () => this.props.navigation.dispatch(resetAction) }
                 ],
                 { cancelable: false }
             )
+            
         }
     }
     async uploadQueue(showMessage) {
@@ -181,7 +182,7 @@ export default class SideMenu extends React.Component {
             <View style={Styles.container}>
                 <ScrollView>
                     <View>
-                        <View style={Styles.navSectionStyle}>
+                        <View>
                             <View style={Styles.navItemContainer}>
                                 <Text style={Styles.navItem} onPress={this.navigateToScreen('Search')}>Search</Text>
                             </View>
@@ -212,14 +213,12 @@ export default class SideMenu extends React.Component {
                         </View>
                     </View>
                 </ScrollView>
-                <View style={Styles.footerContainer}>
-                    
+                <View>
                     <Text style={{padding: 15,paddingLeft:10}}>Currently Logged In: {global.currentlyLoggedIn.firstName} {global.currentlyLoggedIn.lastName}</Text>
                     <View style={Styles.navItemContainer}>
                         <Text style={[Styles.navItem,Styles.logout]} onPress={this.navigateToScreen('loginStack')}>Logout</Text>
                     </View>
                     <Text style={{ padding: 10 }}>Network Status: <Text style={{ color: (global.networkConnected) ? "#689F38" : "#BE2E37" }}>{(global.networkConnected) ? "Connected" : "Not Connected"}</Text></Text>
-                        
                 </View>
             </View>
         );
@@ -232,7 +231,6 @@ SideMenu.propTypes = {
 
 const Styles = StyleSheet.create({
     container: {
-        // paddingTop: 20,
         flex: 1
     },
     navItemContainer:{
@@ -244,12 +242,6 @@ const Styles = StyleSheet.create({
     navItem: {
         padding: 15,
     },
-    navSectionStyle: {
-        // paddingLeft: 10,
-    },
-    footerContainer: {
-        // padding: 20,
-    },
     logout:{
         borderTopWidth: 0.5,
         width: '100%',
@@ -257,7 +249,6 @@ const Styles = StyleSheet.create({
     },
     progressContainer: {
         width: '100%',
-        // borderWidth: 1,
         height: 25
     }
 })
