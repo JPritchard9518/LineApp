@@ -8,13 +8,18 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 
+import android.app.*;
+import android.content.*;
+import android.content.pm.*;
+
+import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
 public class OpenScanAppModule extends ReactContextBaseJavaModule {
-
+  public Context context;
   @Override
   public String getName() {
     /**
@@ -23,11 +28,16 @@ public class OpenScanAppModule extends ReactContextBaseJavaModule {
      */
     return "OpenScanApp";
   }
+  // https://stackoverflow.com/questions/2780102/open-another-application-from-your-own-intent?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+  // **** READ THESE DOCS
   @ReactMethod
   public void openSettings1(Callback cb){
-    // PackageManager packageManager = getPackageManager();
+    // Intent intent = new Intent(Intent.ACTION_Dial,"308-641-2361");
+    // Intent intent = new Intent(com.digitalpersona.uareu.UareUSampleJava.CaptureFingerprintActivity);
+    // PackageManager packageManager = context.getPackageManager();
+    // // PackageManager packageManager = getActivity().getPackageManager();
     // List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-    // int isIntentSafe = activities.size();
+    // boolean isIntentSafe = activities.size() > 0;
     // cb.invoke(isIntentSafe);
     Activity currentActivity = getCurrentActivity();
 
@@ -76,6 +86,7 @@ public class OpenScanAppModule extends ReactContextBaseJavaModule {
   /* constructor */
   public OpenScanAppModule(ReactApplicationContext reactContext) {
     super(reactContext);
+    context = reactContext;
   }
 }
 

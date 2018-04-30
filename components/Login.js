@@ -71,7 +71,7 @@ export default class LoginScreen extends Component {
   openScanApp1(){
     NativeModules.OpenScanApp.openSettings1(data => {
       this.setState({errorMessage:data})
-      // console.log('call back data validate',data)
+      console.log('call back data validate',data)
     });
   }
   openScanApp2() {
