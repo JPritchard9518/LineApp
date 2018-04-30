@@ -1,6 +1,5 @@
 {
     "ip":"10.0.0.6",
     "port":"3000",
-    "adminRouteProd": "http://10.0.0.6:3000",
-    "adminRouteDev":"http://lineappadmin-lineappadmin.193b.starter-ca-central-1.openshiftapps.com"
+    "adminRoute": "https://refugees.cscapstone.us"
 }

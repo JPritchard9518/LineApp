@@ -32,7 +32,7 @@ export default class Recipient extends React.Component {
         };
     }
     componentDidMount() {
-        var url = config.adminRouteProd + '/mobileAPI/retrieveRecipientActions?recipientID=' + this.state.recipient._id;
+        var url = config.adminRoute + '/mobileAPI/retrieveRecipientActions?recipientID=' + this.state.recipient._id;
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 if(responseJson.success){

@@ -52,7 +52,7 @@ export default class LinesList extends React.Component {
         }
     }
     onlineMethod(){
-        var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=lines';
+        var url = config.adminRoute + '/mobileAPI/retrieveList?type=lines';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({

@@ -32,7 +32,7 @@ export default class SystemsUsersList extends React.Component {
         this.setState({ line: lineObj })
     }
     componentDidMount(){
-        var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=systemUsers';
+        var url = config.adminRoute + '/mobileAPI/retrieveList?type=systemUsers';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({

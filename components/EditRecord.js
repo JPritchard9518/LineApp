@@ -46,7 +46,7 @@ export default class EditRecord extends React.Component {
         navigationOptions.title = this.state.record.name;
     }
     componentWillMount(){
-        url = config.adminRouteProd + '/mobileAPI/getPermissionTypes';
+        url = config.adminRoute + '/mobileAPI/getPermissionTypes';
         return fetch(url)
             .then((response) => response.json())
             .then((responseJson) => {
@@ -57,7 +57,7 @@ export default class EditRecord extends React.Component {
     saveRecord(){
         Keyboard.dismiss()
         var data = JSON.stringify(this.state.record)
-        var url = config.adminRouteProd + '/mobileAPI/saveRecord?data=' + data;
+        var url = config.adminRoute + '/mobileAPI/saveRecord?data=' + data;
         return fetch(url, {
             method: "POST",
             }).then((response) => response.json())
@@ -91,7 +91,7 @@ export default class EditRecord extends React.Component {
     deleteRecord(){
         var _id = this.state.record._id;
         var type = this.state.record.type;
-        var url = config.adminRouteProd + '/mobileAPI/deleteRecord?_id=' + _id + '&type=' + type;
+        var url = config.adminRoute + '/mobileAPI/deleteRecord?_id=' + _id + '&type=' + type;
         return fetch(url, {
             method: "POST",
             }).then((response) => response.json())

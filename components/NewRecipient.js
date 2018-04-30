@@ -54,7 +54,7 @@ export default class NewRecipient extends React.Component {
         this.scanFinger = this.scanFinger.bind(this);
     }
     componentDidMount() {
-        var url = config.adminRouteProd + '/mobileAPI/retrieveSettings?type=recipient';
+        var url = config.adminRoute + '/mobileAPI/retrieveSettings?type=recipient';
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
@@ -79,7 +79,7 @@ export default class NewRecipient extends React.Component {
             )
         }
         var data = JSON.stringify(this.state.record)
-        var url = config.adminRouteProd + '/mobileAPI/saveRecipient?data=' + data;
+        var url = config.adminRoute + '/mobileAPI/saveRecipient?data=' + data;
         return fetch(url, {
             method: "POST",
         }).then((response) => response.json())

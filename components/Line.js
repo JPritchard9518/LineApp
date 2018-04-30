@@ -204,7 +204,7 @@ export default class Line extends React.Component {
             Animated.timing(this.state.fadeAnim, { toValue: 1, duration: 200 }).start()
             return this.setState({ type: 'maxAttemptsReached', remainingAttempts: 3, lastAccess:null})
         }
-        var url = config.adminRouteProd + '/mobileAPI/validateAndRetrieveLastAction?lineID=' + this.state.line._id + '&recipientID=' + this.state.currentRecipientID;
+        var url = config.adminRoute + '/mobileAPI/validateAndRetrieveLastAction?lineID=' + this.state.line._id + '&recipientID=' + this.state.currentRecipientID;
         return fetch(url, { method: "GET" }).then((response) => response.json())
             .then((responseJson) => {
                 if (responseJson.success) {
@@ -273,7 +273,7 @@ export default class Line extends React.Component {
             Animated.timing(this.state.fadeAnim, { toValue: 0, duration: 300 }).start()
         }else if(method === 'approve'){
             if(global.networkConnected){
-                var url = config.adminRouteProd + '/mobileAPI/logAction?lineID=' + this.state.line._id + '&lineName=' + this.state.line.name + '&resource=' + this.state.line.resource + '&recipientID=' + this.state.currentRecipientID;
+                var url = config.adminRoute + '/mobileAPI/logAction?lineID=' + this.state.line._id + '&lineName=' + this.state.line.name + '&resource=' + this.state.line.resource + '&recipientID=' + this.state.currentRecipientID;
                 return fetch(url, { method: "POST" }).then((response) => response.json())
                     .then((responseJson) => {
                         if (responseJson.success) {

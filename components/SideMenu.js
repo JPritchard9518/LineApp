@@ -76,7 +76,7 @@ export default class SideMenu extends React.Component {
     async uploadQueue(showMessage) {
         try {
             const value = await AsyncStorage.getItem('actionQueue');
-            var url = config.adminRouteProd + '/mobileAPI/uploadQueue?queue=' + value
+            var url = config.adminRoute + '/mobileAPI/uploadQueue?queue=' + value
             return fetch(url,{method:'POST'})
                 .then((response) => response.json())
                 .then((responseJson) => {
@@ -137,7 +137,7 @@ export default class SideMenu extends React.Component {
         }
     }
     gatherResource = async (collection,index) => {
-        var url = config.adminRouteProd + '/mobileAPI/retrieveList?type=' + collection + '&limit=10000';
+        var url = config.adminRoute + '/mobileAPI/retrieveList?type=' + collection + '&limit=10000';
         await fetch(url)
             .then((response) => response.json())
             .then((responseJson) => this.saveKey(collection, JSON.stringify(responseJson)))

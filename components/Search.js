@@ -34,7 +34,7 @@ export default class Search extends React.Component {
     }
     findUserByFinger(){
         // Gather finger credentials and return recipient record
-        var url = config.adminRouteProd + '/mobileAPI/searchRecipient?&recipientID=' + this.state.recipientID;
+        var url = config.adminRoute + '/mobileAPI/searchRecipient?&recipientID=' + this.state.recipientID;
         return fetch(url, { method: "GET" }).then((response) => response.json())
             .then((responseJson) => {
                 if (responseJson.success) {
