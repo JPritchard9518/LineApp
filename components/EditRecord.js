@@ -9,7 +9,8 @@ import {
     TextInput,
     ScrollView,
     Keyboard,
-    Switch
+    Switch,
+    Alert
 } from 'react-native'
 import { NavigationActions } from 'react-navigation';
 import config from '../config.json';
@@ -75,8 +76,19 @@ export default class EditRecord extends React.Component {
                     this.setState({ errorMessage: error })
                 });
     }
-    deleteRecord() {
+    deleteRecordPrompt() {
         Keyboard.dismiss()
+        Alert.alert(
+            "Are You Sure You Want to Delete This Record?",
+            "",
+            [
+                { text: 'Cancel'},
+                { text: 'Ok', onPress: () => this.deleteRecord() }
+            ],
+            { cancelable: false }
+        )
+    }
+    deleteRecord(){
         var _id = this.state.record._id;
         var type = this.state.record.type;
         var url = config.adminRouteProd + '/mobileAPI/deleteRecord?_id=' + _id + '&type=' + type;
@@ -167,7 +179,7 @@ export default class EditRecord extends React.Component {
                         <Text style={Styles.buttonText}>Save Record</Text>
                     </TouchableOpacity>
                     {global.currentlyLoggedIn.permissions.indexOf(permissionType) > -1 && 
-                        <TouchableOpacity style={Styles.button} onPress={() => this.deleteRecord()}>
+                        <TouchableOpacity style={Styles.button} onPress={() => this.deleteRecordPrompt()}>
                             <Text style={Styles.buttonText}>Delete Record</Text>
                         </TouchableOpacity>
                     }
