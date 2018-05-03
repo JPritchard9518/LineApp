@@ -32,6 +32,16 @@ public class OpenScanAppModule extends ReactContextBaseJavaModule {
   // **** READ THESE DOCS
   @ReactMethod
   public void openSettings1(Callback cb){
+    // Intent intent = new Intent(Intent.ACTION_MAIN);
+    // intent.setComponent(ComponentName.unflattenFromString("android.intent.action.MAIN"));
+    // intent.addCategory(Intent.CATEGORY_LAUNCHER);
+    // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    // context.startActivity(intent);
+
+    openApp(context,"android.intent.action.MAIN");
+
+
+
     // Intent intent = new Intent(Intent.ACTION_Dial,"308-641-2361");
     // Intent intent = new Intent(com.digitalpersona.uareu.UareUSampleJava.CaptureFingerprintActivity);
     // PackageManager packageManager = context.getPackageManager();
@@ -39,19 +49,22 @@ public class OpenScanAppModule extends ReactContextBaseJavaModule {
     // List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
     // boolean isIntentSafe = activities.size() > 0;
     // cb.invoke(isIntentSafe);
-    Activity currentActivity = getCurrentActivity();
+    
+    
+    
+    // Activity currentActivity = getCurrentActivity();
 
-    if (currentActivity == null) {
-      cb.invoke(false);
-      return;
-    }
+    // if (currentActivity == null) {
+    //   cb.invoke(false);
+    //   return;
+    // }
 
-    try {
-      currentActivity.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS));
-      cb.invoke(true);
-    } catch (Exception e) {
-      cb.invoke(e.getMessage());
-    }
+    // try {
+    //   currentActivity.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS));
+    //   cb.invoke(true);
+    // } catch (Exception e) {
+    //   cb.invoke(e.getMessage());
+    // }
   }
   @ReactMethod
   public void openSettings2(Callback cb){
@@ -81,6 +94,22 @@ public class OpenScanAppModule extends ReactContextBaseJavaModule {
   public void openScanAppAndEnroll(Callback cb) {
     cb.invoke("XXXXXXXXXXXXXXXXXXXXX");
     
+  }
+
+  public static boolean openApp(Context context, String packageName) {
+    PackageManager manager = context.getPackageManager();
+    try {
+      Intent i = manager.getLaunchIntentForPackage(packageName);
+      if (i == null) {
+        return false;
+        // throw new ActivityNotFoundException();
+      }
+      i.addCategory(Intent.CATEGORY_LAUNCHER);
+      context.startActivity(i);
+      return true;
+    } catch (ActivityNotFoundException e) {
+      return false;
+    }
   }
 
   /* constructor */

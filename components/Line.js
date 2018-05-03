@@ -11,7 +11,7 @@ import {
     Animated,
     Easing,
     Dimensions,
-    NativeModules
+    NativeModules,
 } from 'react-native';
 import config from '../config.json';
 import moment from 'moment';

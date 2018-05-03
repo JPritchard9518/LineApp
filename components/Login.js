@@ -13,6 +13,11 @@ import {
 import { StackNavigator } from 'react-navigation';
 import config from '../config.json';
 
+import {
+  AndroidNavigator,
+  Intent
+} from 'react-native-android-navigation';
+
 export default class LoginScreen extends Component {
   static navigationOptions = {
     title: 'Login',
@@ -37,6 +42,10 @@ export default class LoginScreen extends Component {
       global.networkConnected = isConnected;
       this.setState({ connected: isConnected })
     });
+    // const retrunFromScanApp = (requestCode, resultCode, data) => {
+    //   console.log(data.getExtras().key1);
+    // };
+    // AndroidNavigator.addEventListener(ActivityEventType.ACTIVITY_RESULT, retrunFromScanApp); //retrunFromScanApp will be called each time Activity result is received
     NetInfo.isConnected.addEventListener('connectionChange', this._handleConnectionChange);
   }
   componentWillUnmount() {
@@ -69,10 +78,24 @@ export default class LoginScreen extends Component {
       });
   }
   openScanApp1(){
-    NativeModules.OpenScanApp.openSettings1(data => {
-      this.setState({errorMessage:data})
-      console.log('call back data validate',data)
-    });
+    const intent = new Intent();
+    // http://www.aftvnews.com/how-to-determine-the-package-name-of-an-android-app/
+    // https://reactnavigation.org/docs/deep-linking.html
+    // https://www.npmjs.com/package/react-native-android-navigation#usage
+
+    // intent.setPackageName('com.digitalpersona.uareu.UareUSampleJava');
+    intent.setPackageName('com.digitalpersona.uareu.UareUSampleJava');
+    intent.putExtras(
+      {
+        "key1": "This is an example value",
+        "key2": "This is another example value"
+      }
+    )
+    AndroidNavigator.startActivity(intent);
+    // NativeModules.OpenScanApp.openSettings1(data => {
+    //   this.setState({errorMessage:data})
+    //   console.log('call back data validate',data)
+    // });
   }
   openScanApp2() {
     NativeModules.OpenScanApp.openSettings2(fid => {
@@ -132,7 +155,9 @@ const styles = StyleSheet.create({
     paddingTop: 30,
   },
   input: {
-    width: '75%'
+    width: '75%',
+    borderColor: 'gray',
+    borderBottomWidth: 1
   },
   header: {
     fontSize: 30,

@@ -137,7 +137,7 @@ export default class SideMenu extends React.Component {
         }
     }
     gatherResource = async (collection,index) => {
-        var url = config.adminRoute + '/mobileAPI/retrieveList?type=' + collection + '&limit=10000';
+        var url = config.adminRoute + '/mobileAPI/retrieveList?type=' + collection + '&pageSize=1000000';
         await fetch(url)
             .then((response) => response.json())
             .then((responseJson) => this.saveKey(collection, JSON.stringify(responseJson)))

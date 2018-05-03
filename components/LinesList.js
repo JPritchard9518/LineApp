@@ -7,8 +7,10 @@ import {
     ListView,
     TouchableOpacity,
     ActivityIndicator,
-    AsyncStorage
+    AsyncStorage,
+    FlatList
 } from 'react-native';
+import {  SearchBar } from "react-native-elements"
 import moment from 'moment';
 import config from '../config.json';
 
@@ -21,29 +23,41 @@ export default class LinesList extends React.Component {
     };
     constructor(props) {
         super(props)
-        const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+        // const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
         this.state = {
-            dataSource: ds,
-            loaded: false,
-            errorMessage: "none"
+            data: [],
+            searching: false,
+            searchResults: [],
+            loading: false,
+            errorMessage: "none",
+            page: 0,
+            refreshing: false,
             // offlineLinesArr: []
         };
+        this.setSearchData = this.setSearchData.bind(this);
     }
     componentDidMount() {
-        if(global.networkConnected){
+        this.beginNetworkRequests();
+    }
+    beginNetworkRequests(){
+        if (global.networkConnected) {
             this.onlineMethod()
-        }else{
+        } else {
             this.setOfflineLines()
         }
     }
     async setOfflineLines() {
         try {
+            this.setState({ loading: true })
             const lines = await AsyncStorage.getItem('lines');
             if (lines === null) lines = [];
+            lines = JSON.parse(lines)
+            lines.sort((a,b) => a.dateCreated > b.dateCreated)
             this.setState({
-                loaded: true,
-                errorMessage: "Success",
-                dataSource: this.state.dataSource.cloneWithRows(JSON.parse(lines))
+                loading: false,
+                data: lines,
+                refreshing: false,
+                searching: false
             })
             // this.offlineMethod()
         } catch (error) {
@@ -52,12 +66,15 @@ export default class LinesList extends React.Component {
         }
     }
     onlineMethod(){
-        var url = config.adminRoute + '/mobileAPI/retrieveList?type=lines';
+        this.setState({ loading: true, page: 0 })
+        var url = config.adminRoute + '/mobileAPI/retrieveList?type=lines&page=' + (this.state.page + 1);
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({
-                    loaded: true,
-                    dataSource: this.state.dataSource.cloneWithRows(responseJson)
+                    loading: false,
+                    data: responseJson,
+                    page: this.state.page + 1,
+                    refreshing: false
                 })
 
             })
@@ -65,16 +82,34 @@ export default class LinesList extends React.Component {
                 this.setState({ errorMessage: error })
             });
     }
+    refresh(){
+        if(!global.networkConnected) return null;
+        this.setState({refreshing:true, loading: true})
+        this.beginNetworkRequests()
+    }
+    loadMore(){
+        if(!global.networkConnected) return null;
+        this.setState({loading: true})
+        var url = config.adminRoute + '/mobileAPI/retrieveList?type=lines&page=' + (this.state.page + 1);
+        return fetch(url).then((response) => response.json())
+            .then((responseJson) => {
+                this.setState({
+                    loading: false,
+                    data: (responseJson.length === 0) ? this.state.data : [...this.state.data, ...responseJson],
+                    page: this.state.page + 1
+                }) 
+            })
+    }
     // offlineMethod(){
     //     var offlineLinesArr = this.state.offlineLinesArr;
     //     this.setState({
-    //         loaded: true,
+    //         loading: true,
     //         dataSource: thistate.dataSource.cloneWithRows(offlineLinesArr)
     //     })
     // }
     renderRow(line) {
         return (
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('Line',{line:line})} style={Styles.lineContainer}>
+            <TouchableOpacity key={line._id} onPress={() => this.props.navigation.navigate('Line',{line:line})} style={Styles.lineContainer}>
                 <Text style={[Styles.lineContainerText,{fontSize: 25}]}>Line Name: {line.name}</Text>
                 <Text style={Styles.lineContainerText}>Resource: {line.resource}</Text>
                 {/* <Text style={Styles.lineContainerText}>Capacity: {line.currentCapacity}/{line.capacity}</Text> */}
@@ -84,26 +119,66 @@ export default class LinesList extends React.Component {
             </TouchableOpacity>
         )
     }
+    setSearchData(value){
+        this.setState({ searching: true })
+        var url = config.adminRoute + '/mobileAPI/searchLines?searchTerm=' + value;
+        return fetch(url).then((response) => response.json())
+            .then((responseJson) => {
+                this.setState({
+                    searchResults: responseJson,
+                })
+            })
+    }
+    renderHeader = () => {
+        if(!global.networkConnected) return null;
+        return (
+            <SearchBar
+                placeholder="Search Line Name or Resource..."
+                showLoading
+                platform="android"
+                lightTheme
+                onChangeText={(value) => this.setSearchData(value)}
+                onClear={() => this.setState({searching: false})}
+                onCancel={() => this.setState({searching: false})}
+            />);
+    }
+    renderFooter = () => {
+        if (!this.state.loading) return null;
+
+        return (
+            <View
+                style={{
+                    paddingVertical: 20,
+                    borderTopWidth: 1,
+                    borderColor: "#CED0CE"
+                }}
+            >
+                <ActivityIndicator animating size="large" />
+            </View>
+        );
+    };
     render() {
-        if(this.state.loaded){
-            if(this.state.dataSource.getRowCount() > 0){
-                return (
-                    <ListView
-                        style={Styles.container}
-                        dataSource={this.state.dataSource}
-                        renderRow={(data) => this.renderRow(data)} />
-                )
-            }else{
-                return(<Text style={{fontSize:18,padding:15}}>No Data To Show. Please Add a Line.</Text>)
-            }
-        }else if(global.networkConnected){
-            return(
-                <View style={Styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#0000ff" />
-                </View>
+        if(this.state.data.length > 0){
+            return (
+                <FlatList
+                    data={(this.state.searching) ? this.state.searchResults : this.state.data}
+                    renderItem={({ item }) => (
+                        this.renderRow(item)
+                    )}
+                    keyExtractor={item => item.name}
+                    ListHeaderComponent={this.renderHeader()}
+                    ListFooterComponent={this.renderFooter()}
+                    refreshing={this.state.refreshing}
+                    onRefresh={() => this.refresh()}
+                    onEndReachedThreshold={0.25}
+                    onEndReached={() => this.loadMore()}
+                />
             )
+        } else if(!global.networkConnected) {
+            return (<Text style={{ fontSize: 18, padding: 15 }}>No network connection. Go within network range, open the menu, and press "Prepare for Offline Use" if you anticipate being outside of network.</Text>)
+        
         }else{
-            return(<Text style={{ fontSize: 18, padding: 15 }}>No network connection. Go within network range, open the menu, and press "Prepare for Offline Use" if you anticipate being outside of network.</Text>)
+            return(<Text style={{fontSize:18,padding:15}}>No Data To Show. Please Add a Line.</Text>)
         }
     }
 }
