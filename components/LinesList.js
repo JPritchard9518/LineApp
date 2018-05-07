@@ -66,21 +66,22 @@ export default class LinesList extends React.Component {
         }
     }
     onlineMethod(){
-        this.setState({ loading: true, page: 0 })
-        var url = config.adminRoute + '/mobileAPI/retrieveList?type=lines&page=' + (this.state.page + 1);
-        return fetch(url).then((response) => response.json())
-            .then((responseJson) => {
-                this.setState({
-                    loading: false,
-                    data: responseJson,
-                    page: this.state.page + 1,
-                    refreshing: false
-                })
+        this.setState({ loading: true, page: 0 },function(){
+            var url = config.adminRoute + '/mobileAPI/retrieveList?type=lines&page=' + (this.state.page + 1);
+            return fetch(url).then((response) => response.json())
+                .then((responseJson) => {
+                    this.setState({
+                        loading: false,
+                        data: responseJson,
+                        page: this.state.page + 1,
+                        refreshing: false
+                    })
 
-            })
-            .catch((error) => {
-                this.setState({ errorMessage: error })
-            });
+                })
+                .catch((error) => {
+                    this.setState({ errorMessage: error })
+                });
+        })
     }
     refresh(){
         if(!global.networkConnected) return null;
@@ -134,9 +135,10 @@ export default class LinesList extends React.Component {
         return (
             <SearchBar
                 placeholder="Search Line Name or Resource..."
-                showLoading
                 platform="android"
                 lightTheme
+                inputStyle={{marginTop:10}}
+                cancelIcon
                 onChangeText={(value) => this.setSearchData(value)}
                 onClear={() => this.setState({searching: false})}
                 onCancel={() => this.setState({searching: false})}
@@ -178,7 +180,7 @@ export default class LinesList extends React.Component {
             return (<Text style={{ fontSize: 18, padding: 15 }}>No network connection. Go within network range, open the menu, and press "Prepare for Offline Use" if you anticipate being outside of network.</Text>)
         
         }else{
-            return(<Text style={{fontSize:18,padding:15}}>No Data To Show. Please Add a Line.</Text>)
+            return(<Text style={{fontSize:18,padding:15}}>No Data To Show. Please Add a Line. Data length: {this.state.data.length} Data: {this.state.data}</Text>)
         }
     }
 }
