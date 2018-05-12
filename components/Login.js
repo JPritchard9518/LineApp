@@ -60,8 +60,6 @@ export default class LoginScreen extends Component {
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
-    userName = 'testUser'
-    password = 'password123'
     var url = config.adminRoute + '/mobileAPI/login?userName=' + userName + '&password=' + password;
     return fetch(url).then((response) => response.json())
       .then((responseJson) => {
@@ -131,12 +129,12 @@ export default class LoginScreen extends Component {
           <TouchableOpacity style={styles.button} onPress={() => this.login()}>
             <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={this.openScanApp1}>
+          {/* <TouchableOpacity style={styles.button} onPress={this.openScanApp1}>
             <Text style={styles.buttonText}>Launch Settings 1</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={this.openScanApp2}>
             <Text style={styles.buttonText}>Launch Settings 2</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{this.state.errorMessage}</Text>
@@ -156,8 +154,8 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '75%',
-    borderColor: 'gray',
-    borderBottomWidth: 1
+    // borderColor: 'gray',
+    // borderBottomWidth: 1
   },
   header: {
     fontSize: 30,
