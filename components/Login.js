@@ -60,8 +60,10 @@ export default class LoginScreen extends Component {
     Keyboard.dismiss()
     var userName = this.state.userName;
     var password = this.state.password;
+    userName = 'btucker'
+    password = 'password123'
     var url = config.adminRoute + '/mobileAPI/login?userName=' + userName + '&password=' + password;
-    return fetch(url).then((response) => response.json())
+    return fetch(url,{body:null,method:"GET"}).then((response) => response.json())
       .then((responseJson) => {
         if (responseJson.success) {
           global.currentlyLoggedIn = responseJson.loggedIn;

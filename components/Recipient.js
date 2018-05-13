@@ -36,14 +36,12 @@ export default class Recipient extends React.Component {
         return fetch(url).then((response) => response.json())
             .then((responseJson) => {
                 if(responseJson.success){
-                    console.log('Success true')
                     this.setState({
                         loaded: true,
                         dataSource: this.state.dataSource.cloneWithRows(responseJson.recipientActions.actions),
                         errorMessage: ''
                     })
                 }else{
-                    console.log("Success false")
                     this.setState({
                         loaded:true,
                         errorMessage: responseJson.message

@@ -60,7 +60,6 @@ export default class NewRecipient extends React.Component {
                 this.setState({
                     customFields: responseJson.settings.fields
                 })
-
             })
             .catch((error) => {
                 this.setState({ errorMessage: error })
@@ -133,16 +132,26 @@ export default class NewRecipient extends React.Component {
         updatedRecord[key] = newValue;
         this.setState({ record: updatedRecord })
     }
-    renderCustomFields(key,index){
-        return(
+    renderCustomFields(key, index) {
+        return (
             <View key={key} style={Styles.inputContainer}>
                 <Text>{key}</Text>
                 <TextInput
                     onChangeText={((newValue) => this.updateText(newValue, key))}
-                    value={this.state.record.familyMembers[index][key]} />
+                    value={this.state.record[key]} />
             </View>
         )
     }
+    // renderCustomFields(key,index){
+    //     return(
+    //         <View key={key} style={Styles.inputContainer}>
+    //             <Text>{key}</Text>
+    //             <TextInput
+    //                 onChangeText={((newValue) => this.updateText(newValue, key))}
+    //                 value={this.state.record.familyMembers[index][key]} />
+    //         </View>
+    //     )
+    // }
     renderFamilyInput(){
             return(
             <View>
@@ -170,6 +179,7 @@ export default class NewRecipient extends React.Component {
             specialNeeds: 'Special Needs',
             notes: 'Notes'
         }
+        this.state.customFields.forEach((field) => keys[field] = field)
         if(field === 'dateOfBirth'){
             return (
                 <View key={index + field} style={Styles.inputContainer}>
@@ -224,6 +234,8 @@ export default class NewRecipient extends React.Component {
             specialNeeds: "",
             notes: "",
         }
+        debugger;
+        this.state.customFields.forEach((field) => famObj[field] = "")
         var newFamObj = {}
         for (field in famObj) {
             var newField = (famNum - 1) + field
